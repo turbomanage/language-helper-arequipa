@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="conectores">
+        <item>provided that</item>
+        <item>before</item>
+        <item>unless</item>
+        <item>as long as</item>
+    </string-array>
+</resources>
