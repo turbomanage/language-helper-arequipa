@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.languagehelper.MainActivity" >
 
+    <item android:id="@+id/language_spinner"
+        android:title="Select language"
+        app:showAsAction="ifRoom"
+	 	app:actionViewClass="android.widget.Spinner" />
+    
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
