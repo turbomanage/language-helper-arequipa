@@ -5,6 +5,8 @@ import android.support.v4.app.ListFragment;
 
 public class ConectoresFragment extends ListFragment {
 	
+	private WordAdapter wordAdapter;
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		String[] originales = this.getActivity().getResources()
@@ -15,9 +17,13 @@ public class ConectoresFragment extends ListFragment {
 		for (int i = 0; i < originales.length; i++) {
 			palabras[i] = new Palabra(originales[i], traducciones[i]);
 		}
-		WordAdapter wordAdapter = new WordAdapter(getActivity(), R.layout.row, palabras);
+		wordAdapter = new WordAdapter(getActivity(), R.layout.row, palabras);
 		setListAdapter(wordAdapter);
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	public void swapViews() {
+		wordAdapter.swapViews();
 	}
 	
 }

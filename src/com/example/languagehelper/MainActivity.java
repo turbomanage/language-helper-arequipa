@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,10 @@ public class MainActivity extends ActionBarActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	ConectoresFragment conectoresFragment;
+	ConectoresFragment preposicionesFragment;
+	ConectoresFragment verbosFragment;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class MainActivity extends ActionBarActivity implements
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+		conectoresFragment = new ConectoresFragment();
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -86,9 +92,10 @@ public class MainActivity extends ActionBarActivity implements
 		getMenuInflater().inflate(R.menu.main, menu);
 		MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
 		Spinner spinner = (Spinner) spinnerItem.getActionView();
-		// Create an ArrayAdapter using the string array and a default spinner layout
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-				R.array.idiomas, R.layout.actionbar_spinner_item);
+		// Create an ArrayAdapter using the string array and a default spinner
+		// layout
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.idiomas, R.layout.actionbar_spinner_item);
 		// Specify the layout to use when the list of choices appears
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
@@ -101,11 +108,15 @@ public class MainActivity extends ActionBarActivity implements
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		switch (item.getItemId()) {
+		case R.id.action_swap:
+			Log.i("MainActivity", "button pressed");
+			conectoresFragment.swapViews();
+		case R.id.action_settings:
 			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -141,8 +152,20 @@ public class MainActivity extends ActionBarActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
-//			return PlaceholderFragment.newInstance(position + 1);
-			return new ConectoresFragment();
+			// return PlaceholderFragment.newInstance(position + 1);
+			switch (position) {
+			case 0:
+				conectoresFragment = new ConectoresFragment();
+				return conectoresFragment;
+			case 1:
+				preposicionesFragment = new ConectoresFragment();
+				return preposicionesFragment;
+			case 2:
+				verbosFragment = new ConectoresFragment();
+				return verbosFragment;
+			default:
+				return null;
+			}
 		}
 
 		@Override
