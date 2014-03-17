@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="conectores_originales">
-        <item>con tal de que</item>
-        <item>antes de</item>
-        <item>a menos que</item>
-        <item>siempre y cuando</item>
-    </string-array>
-</resources>
