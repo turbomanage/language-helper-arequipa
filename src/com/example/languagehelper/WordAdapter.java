@@ -10,13 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class WordAdapter extends ArrayAdapter<Palabra> {
+public class WordAdapter extends ArrayAdapter<PalabraMap> {
 
 	private Context context;
-	private Palabra[] byOrig, byTrad;
+	private PalabraMap[] byOrig, byTrad;
 	private boolean isOrigFirst = true;
 
-	public WordAdapter(Context context, int resource, Palabra[] objects) {
+	public WordAdapter(Context context, int resource, PalabraMap[] objects) {
 		super(context, resource, objects);
 		this.context = context;
 		this.byOrig = objects.clone();
@@ -25,16 +25,16 @@ public class WordAdapter extends ArrayAdapter<Palabra> {
 		Arrays.sort(byTrad, sortByTrad);
 	}
 
-	private Comparator<Palabra> sortByOrig = new Comparator<Palabra>() {
+	private Comparator<PalabraMap> sortByOrig = new Comparator<PalabraMap>() {
 		@Override
-		public int compare(Palabra lhs, Palabra rhs) {
+		public int compare(PalabraMap lhs, PalabraMap rhs) {
 			return lhs.getOrig().compareTo(rhs.getOrig());
 		}
 	};
 
-	private Comparator<Palabra> sortByTrad = new Comparator<Palabra>() {
+	private Comparator<PalabraMap> sortByTrad = new Comparator<PalabraMap>() {
 		@Override
-		public int compare(Palabra lhs, Palabra rhs) {
+		public int compare(PalabraMap lhs, PalabraMap rhs) {
 			return lhs.getTrad().compareTo(rhs.getTrad());
 		}
 	};

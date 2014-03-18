@@ -1,8 +1,17 @@
 package com.example.languagehelper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,8 +30,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.languagehelper.Palabra.Classification;
+import com.example.languagehelper.dao.PalabraDao;
+import com.example.languagehelper.dao.PalabraTable;
+
 public class MainActivity extends ActionBarActivity implements
 		ActionBar.TabListener {
+
+	private static final String IS_INITIALIZED = "isInitialized";
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,7 +55,8 @@ public class MainActivity extends ActionBarActivity implements
 	ConectoresFragment conectoresFragment;
 	ConectoresFragment preposicionesFragment;
 	ConectoresFragment verbosFragment;
-	
+
+	static final Locale ESPAÑOL = new Locale("es");
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +66,15 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+		// Initialize the database on first run
+		SharedPreferences settings = getPreferences(0);
+		if (!settings.getBoolean(IS_INITIALIZED, false)) {
+			populateDb();
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putBoolean(IS_INITIALIZED, true);
+			editor.commit();
+		}
 
 		conectoresFragment = new ConectoresFragment();
 		// Create the adapter that will return a fragment for each of the three
@@ -94,13 +119,28 @@ public class MainActivity extends ActionBarActivity implements
 		Spinner spinner = (Spinner) spinnerItem.getActionView();
 		// Create an ArrayAdapter using the string array and a default spinner
 		// layout
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.idiomas, R.layout.actionbar_spinner_item);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.actionbar_spinner_item);
+		adapter.addAll(getLocalesFromDb());
 		// Specify the layout to use when the list of choices appears
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
 		spinner.setAdapter(adapter);
 		return true;
+	}
+
+	private List<String> getLocalesFromDb() {
+		List<String> locales = new ArrayList<String>();
+		PalabraDao dao = new PalabraDao(this);
+		SQLiteDatabase db = dao.getDbHelper(this).getReadableDatabase();
+		// SELECT DISTINCT Locale FROM PALABRA
+		Cursor c = db.query(true, "Palabra", new String[]{"Locale"}, null, null, null, null, null, null);
+		for (boolean hasItem = c.moveToFirst(); hasItem; hasItem = c.moveToNext()) {
+			String localeStr = c.getString(0);
+			Log.d(MainActivity.class.getName(), "locale: " + localeStr);
+			locales.add(new Locale(localeStr).getDisplayLanguage());
+		}
+		c.close();
+		return locales;
 	}
 
 	@Override
@@ -135,6 +175,50 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onTabReselected(ActionBar.Tab tab,
 			FragmentTransaction fragmentTransaction) {
+	}
+
+	private List<String> readWords(String filename) {
+		ArrayList<String> words = new ArrayList<String>();
+		try {
+			InputStream is = getResources().getAssets().open(filename);
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader bufferedReader = new BufferedReader(isr);
+			// primera pasada atrás del ciclo
+			String word = bufferedReader.readLine();
+			while (word != null) {
+				words.add(word);
+				word = bufferedReader.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return words;
+	}
+
+	private void populateDb() {
+		PalabraDao dao = new PalabraDao(this);
+		// poblar base de datos
+		try {
+			String[] files = getResources().getAssets().list("");
+			for (int i = 0; i < files.length; i++) {
+				String filename = files[i];
+				if (filename.startsWith("palabras")) {
+					Log.d(MainActivity.class.getName(), "file: " + filename);
+					String[] split = filename.split("\\.");
+					// Remove "palabras-"
+					String localeStr = split[0].substring(9);
+					List<String> palabras = readWords(filename);
+					for (String p : palabras) {
+						Palabra palabra = new Palabra(p, new Locale(localeStr),
+								Classification.CONNECTOR);
+						dao.insert(palabra);
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Log.i(ConectoresFragment.class.getName(), "Database populated");
 	}
 
 	/**

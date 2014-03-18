@@ -1,28 +1,53 @@
 package com.example.languagehelper;
 
+import java.util.Locale;
+
+import com.turbomanage.storm.api.Entity;
+
+@Entity
 public class Palabra {
-
-	String orig, trad;
-
-	public Palabra(String orig, String trad) {
-		this.orig = orig;
-		this.trad = trad;
+	
+	public enum Classification {CONNECTOR, PREPOSITION, VERB};
+	
+	private long id;
+	String word;
+	Locale locale; // en
+	Classification type;
+	
+	public Palabra() {
+		// TODO Auto-generated constructor stub
 	}
-
-	public String getOrig() {
-		return orig;
+	
+	public Palabra(String p, Locale locale, Classification type) {
+		// TODO Auto-generated constructor stub
+		this.word = p;
+		this.locale = locale;
+		this.type = type;
 	}
-
-	public void setOrig(String orig) {
-		this.orig = orig;
+	
+	public Locale getLocale() {
+		return locale;
 	}
-
-	public String getTrad() {
-		return trad;
+	public void setLocale(Locale locale) {
+		this.locale = locale;
 	}
-
-	public void setTrad(String trad) {
-		this.trad = trad;
+	public String getWord() {
+		return word;
+	}
+	public void setWord(String word) {
+		this.word = word;
+	}
+	public Classification getType() {
+		return type;
+	}
+	public void setType(Classification type) {
+		this.type = type;
+	}
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
 	}
 	
 }
