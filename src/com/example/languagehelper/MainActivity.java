@@ -208,8 +208,9 @@ public class MainActivity extends ActionBarActivity implements
 					// Remove "palabras-"
 					String localeStr = split[0].substring(9);
 					List<String> palabras = readWords(filename);
-					for (String p : palabras) {
-						Palabra palabra = new Palabra(p, new Locale(localeStr),
+					for (int j = 0; j < palabras.size(); j++) {
+						String p = palabras.get(j);
+						Palabra palabra = new Palabra(j, p, new Locale(localeStr),
 								Classification.CONNECTOR);
 						dao.insert(palabra);
 					}

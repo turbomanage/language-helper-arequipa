@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
+import com.example.languagehelper.dao.PalabraTable.Columns;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -30,7 +31,7 @@ public class ConectoresFragment extends ListFragment {
 		Palabra exampleQuery = new Palabra();
 		exampleQuery.setLocale(locale);
 		exampleQuery.setType(c);
-		List<Palabra> palabras = dao.listByExample(exampleQuery);
+		List<Palabra> palabras = dao.load().byExample(exampleQuery).order(Columns.ORD.asc()).list();
 		String[] words = new String[palabras.size()];
 		int i = 0;
 		for (Palabra p : palabras) {

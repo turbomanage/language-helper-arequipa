@@ -10,6 +10,7 @@ public class Palabra {
 	public enum Classification {CONNECTOR, PREPOSITION, VERB};
 	
 	private long id;
+	int ord; // ordinal of the word in the file
 	String word;
 	Locale locale; // en
 	Classification type;
@@ -18,8 +19,9 @@ public class Palabra {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Palabra(String p, Locale locale, Classification type) {
+	public Palabra(int ord, String p, Locale locale, Classification type) {
 		// TODO Auto-generated constructor stub
+		this.ord = ord;
 		this.word = p;
 		this.locale = locale;
 		this.type = type;
@@ -48,6 +50,14 @@ public class Palabra {
 	}
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public int getOrd() {
+		return ord;
+	}
+
+	public void setOrd(int ord) {
+		this.ord = ord;
 	}
 	
 }
