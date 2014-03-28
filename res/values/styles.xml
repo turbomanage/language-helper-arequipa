@@ -14,19 +14,14 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="actionBarStyle">@style/AppTheme.MyActionBar</item>
+        <!-- All customizations that are NOT specific to a particular API-level can go here.--> 
+        <item name="actionBarStyle">@style/AppTheme.MyActionBar</item> 
         <item name="android:actionBarStyle" tools:ignore="NewApi">@style/AppTheme.MyActionBar</item>
     </style>
 
     <style name="AppTheme.MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
         <item name="displayOptions">showHome|useLogo</item>
         <item name="android:displayOptions" tools:ignore="NewApi">showHome|useLogo</item>
-    </style>
-
-    <style name="actionBarSpinnerItemStyle" parent="@style/AppTheme">
-        <item name="android:textColor">@android:color/primary_text_dark</item>
-        <item name="android:textColorHighlight">@android:color/primary_text_dark</item>
     </style>
 
 </resources>

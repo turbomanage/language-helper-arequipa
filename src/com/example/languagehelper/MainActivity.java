@@ -119,7 +119,7 @@ public class MainActivity extends ActionBarActivity implements
 		Spinner spinner = (Spinner) spinnerItem.getActionView();
 		// Create an ArrayAdapter using the string array and a default spinner
 		// layout
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.actionbar_spinner_item);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
 		adapter.addAll(getLocalesFromDb());
 		// Specify the layout to use when the list of choices appears
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -248,6 +248,18 @@ public class MainActivity extends ActionBarActivity implements
 			case 2:
 				verbosFragment = new ConectoresFragment();
 				return verbosFragment;
+			case 3:
+				verbosFragment = new ConectoresFragment();
+				return verbosFragment;
+			case 4:
+				verbosFragment = new ConectoresFragment();
+				return verbosFragment;
+			case 5:
+				verbosFragment = new ConectoresFragment();
+				return verbosFragment;
+			case 6:
+				verbosFragment = new ConectoresFragment();
+				return verbosFragment;
 			default:
 				return null;
 			}
@@ -255,8 +267,8 @@ public class MainActivity extends ActionBarActivity implements
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
-			return 3;
+			// Show 4 total pages.
+			return 6;
 		}
 
 		@Override
