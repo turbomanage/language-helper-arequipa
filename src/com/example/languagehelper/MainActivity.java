@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,16 +27,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
-import com.example.languagehelper.dao.PalabraTable;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener {
+		ActionBar.TabListener, OnItemSelectedListener {
 
 	private static final String IS_INITIALIZED = "isInitialized";
 
@@ -55,6 +58,8 @@ public class MainActivity extends ActionBarActivity implements
 	ConectoresFragment conectoresFragment;
 	ConectoresFragment preposicionesFragment;
 	ConectoresFragment verbosFragment;
+
+	private String[] locales;
 
 	static final Locale ESPAÑOL = new Locale("es");
 
@@ -109,23 +114,51 @@ public class MainActivity extends ActionBarActivity implements
 		}
 	}
 
+	int readLocales() {
+		String defaultLocale = Locale.getDefault().getLanguage();
+		int defaultPos = 0;
+		try {
+			locales = getAssets().list("words");
+			for (int i = 0; i < locales.length; i++) {
+				String lc = locales[i];
+				if (lc.equals(defaultLocale)) {
+					defaultPos = i;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return defaultPos;
+	}
+
 	@SuppressLint("NewApi")
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
+		int defaultPos = readLocales();
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
 		Spinner spinner = (Spinner) spinnerItem.getActionView();
+		spinner.setOnItemSelectedListener(this);
 		// Create an ArrayAdapter using the string array and a default spinner
 		// layout
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-		adapter.addAll(getLocalesFromDb());
+		adapter.addAll(getDisplayLanguages());
 		// Specify the layout to use when the list of choices appears
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
 		spinner.setAdapter(adapter);
+		spinner.setSelection(defaultPos);
 		return true;
+	}
+
+	private Collection<? extends String> getDisplayLanguages() {
+		ArrayList<String> displayLanguages = new ArrayList<String>();
+		for (String lc : locales) {
+			String displayLanguage = new Locale(lc).getDisplayLanguage();
+			displayLanguages.add(displayLanguage);
+		}
+		return displayLanguages;
 	}
 
 	private List<String> getLocalesFromDb() {
@@ -321,6 +354,24 @@ public class MainActivity extends ActionBarActivity implements
 					ARG_SECTION_NUMBER)));
 			return rootView;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)
+	 * 
+	 * Language spinner
+	 */
+	@Override
+	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
+			long id) {
+		String itemAtPosition = (String) adapterView.getItemAtPosition(pos);
+		Toast.makeText(this, "selected " + itemAtPosition, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
