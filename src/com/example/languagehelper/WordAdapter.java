@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class WordAdapter extends ArrayAdapter<PalabraMap> {
 
@@ -41,6 +43,7 @@ public class WordAdapter extends ArrayAdapter<PalabraMap> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		Log.d("view", "getview was called for " + position);
 		LayoutInflater inflater = (LayoutInflater) context
 		        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.row, null);

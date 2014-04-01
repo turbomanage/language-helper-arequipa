@@ -3,7 +3,6 @@ package com.example.languagehelper;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 
@@ -13,10 +12,13 @@ import com.example.languagehelper.dao.PalabraTable.Columns;
 
 public class WordsFragment extends ListFragment {
 
+	public static final String KEY_TAB_NUM = "tabNum";
+	public static final String KEY_LOCALE = "locale";
+	
 	private WordAdapter wordAdapter;
-	private LanguageModel model;
 	private int tabNum;
 	private MainActivity mainActivity;
+	private String locale;
 	
 	public WordsFragment() {
 		super();
@@ -26,9 +28,12 @@ public class WordsFragment extends ListFragment {
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
+		tabNum = getArguments().getInt(KEY_TAB_NUM);
+		locale = getArguments().getString(KEY_LOCALE);
 		// Get locale and classification from Bundle
-		String[] originales = readFromDb(Classification.CONNECTOR, MainActivity.ESPAÑOL);
-		String[] traducciones = readFromDb(Classification.CONNECTOR, Locale.ENGLISH);
+		Classification tabClassification = Classification.values()[tabNum];
+		String[] originales = readFromDb(tabClassification, MainActivity.ESPAÑOL);
+		String[] traducciones = readFromDb(tabClassification, locale);
 		PalabraMap[] palabras = new PalabraMap[originales.length];
 		for (int i = 0; i < originales.length; i++) {
 			palabras[i] = new PalabraMap(originales[i], traducciones[i]);
@@ -38,16 +43,17 @@ public class WordsFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 	}
 	
-	private String[] readFromDb(Classification c, Locale locale) {
+	private String[] readFromDb(Classification c, String locale) {
 		PalabraDao dao = new PalabraDao(getActivity());
 		Palabra exampleQuery = new Palabra();
 		exampleQuery.setLocale(locale);
 		exampleQuery.setType(c);
 		List<Palabra> palabras = dao.load().byExample(exampleQuery).order(Columns.ORD.asc()).list();
-		String[] words = new String[palabras.size()];
-		int i = 0;
-		for (Palabra p : palabras) {
-			words[i++] = p.getWord();
+		String[] words = new String[palabras.size() - 1];
+		// skip title
+		for (int j = 1; j < palabras.size(); j++) {
+			String word = palabras.get(j).getWord();
+			words[j-1] = word;
 		}
 		return words;
 	}

@@ -11,8 +11,6 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -31,10 +29,9 @@ import android.widget.Spinner;
 
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
-import com.example.languagehelper.dao.PalabraTable.Columns;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener, OnItemSelectedListener, LanguageModel {
+		ActionBar.TabListener, OnItemSelectedListener {
 
 	private static final String TRANSLATIONS_FOLDER = "words";
 
@@ -57,26 +54,28 @@ public class MainActivity extends ActionBarActivity implements
 	private String[] locales;
 	private int selectedLocaleNum;
 
-	static final Locale ESPAÑOL = new Locale("es");
+	static final String ESPAÑOL = "es";
+
+	private ActionBar actionBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// Set up the action bar.
-		final ActionBar actionBar = getSupportActionBar();
+		actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
 		// Init locales
 		initLocale("es");
 		this.selectedLocaleNum = readLocales();
-		initLocale(this.locales[this.selectedLocaleNum]);
+		String selectedLocale = this.locales[this.selectedLocaleNum];
+		initLocale(selectedLocale);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				this, getSupportFragmentManager());
+		mSectionsPagerAdapter = new SectionsPagerAdapter(this,
+				getSupportFragmentManager(), selectedLocale);
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -92,9 +91,10 @@ public class MainActivity extends ActionBarActivity implements
 						actionBar.setSelectedNavigationItem(position);
 					}
 				});
+	}
 
-		// TODO extract method
-		// For each of the sections in the app, add a tab to the action bar.
+	// For each of the sections in the app, add a tab to the action bar.
+	private void drawTabs() {
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 			// Create a tab with text corresponding to the page title defined by
 			// the adapter. Also specify this Activity object, which implements
@@ -162,8 +162,13 @@ public class MainActivity extends ActionBarActivity implements
 		case R.id.action_swap:
 			Log.i("MainActivity", "button pressed");
 			// TODO notify observers
-			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
-			frag.swapViews();
+//			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+//			frag.swapViews();
+			int numTabs = mSectionsPagerAdapter.getCount();
+			for (int i = 0; i < numTabs; i++) {
+				WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter.getItem(i);
+				wordsFragment.swapViews();
+			}
 		case R.id.action_settings:
 			return true;
 		default:
@@ -215,11 +220,14 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
-//		String itemAtPosition = (String) adapterView.getItemAtPosition(pos);
 		initLocale(locales[pos]);
 		selectedLocaleNum = pos;
 		// TODO just replace the whole section pager adapter, but keep current tab selected
-		mSectionsPagerAdapter.notifyDataSetChanged();
+		String selectedLocale = this.locales[this.selectedLocaleNum];
+		mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedLocale);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+		actionBar.removeAllTabs();
+		drawTabs();
 	}
 
 	/**
@@ -254,13 +262,13 @@ public class MainActivity extends ActionBarActivity implements
 				Log.d(MainActivity.class.getName(), "file: " + filename);
 				List<String> palabras = readWords(path + "/" + filename);
 				// Save title with ordinal 0
-				Palabra title = new Palabra(0, filename.substring(1), new Locale(selectedLocale), Classification.TITLE);
+				Palabra title = new Palabra(0, filename.substring(1), selectedLocale, Classification.values()[i]);
 				dao.insert(title);
 				for (int j = 0; j < palabras.size(); j++) {
 					String p = palabras.get(j);
 					// Use file numbers to read in order of Classification enum
-					Palabra palabra = new Palabra(j+1, p, new Locale(selectedLocale),
-							Classification.values()[i+1]);
+					Palabra palabra = new Palabra(j+1, p, selectedLocale,
+							Classification.values()[i]);
 					dao.insert(palabra);
 				}
 			}
@@ -276,27 +284,27 @@ public class MainActivity extends ActionBarActivity implements
 		
 	}
 
-	@Override
-	public String getSelectedLocale() {
-		return this.locales[this.selectedLocaleNum];
-	}
-
-	@Override
-	public Classification getClassificationForTab(int ord) {
-		// TODO Allow user ordering
-		return Classification.values()[ord + 1];
-	}
-
-	@Override
-	public int getNumTabs() {
-		return Classification.values().length - 1; // omit title
-	}
-
-	@Override
-	public String getTitleForTab(int ord) {
-		PalabraDao dao = new PalabraDao(this);
-		List<Palabra> types = dao.load().eq(Columns.ORD, 0).order(Columns.TYPE.asc()).list();
-		return types.get(ord).getWord();
-	}
+//	@Override
+//	public String getSelectedLocale() {
+//		return this.locales[this.selectedLocaleNum];
+//	}
+//
+//	@Override
+//	public Classification getClassificationForTab(int ord) {
+//		// TODO Allow user ordering
+//		return Classification.values()[ord + 1];
+//	}
+//
+//	@Override
+//	public int getNumTabs() {
+//		return Classification.values().length - 1; // omit title
+//	}
+//
+//	@Override
+//	public String getTitleForTab(int ord) {
+//		PalabraDao dao = new PalabraDao(this);
+//		List<Palabra> types = dao.load().eq(Columns.ORD, 0).order(Columns.TYPE.asc()).list();
+//		return types.get(ord).getWord();
+//	}
 
 }

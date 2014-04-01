@@ -1,25 +1,23 @@
 package com.example.languagehelper;
 
-import java.util.Locale;
-
 import com.turbomanage.storm.api.Entity;
 
 @Entity
 public class Palabra {
 	
-	public enum Classification {TITLE, CONNECTOR, PREPOSITION, VERB};
+	public enum Classification {CONNECTOR, PREPOSITION, VERB};
 	
 	private long id;
 	int ord; // ordinal of the word in the file
 	String word;
-	Locale locale; // en
+	String locale; // en
 	Classification type;
 	
 	public Palabra() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Palabra(int ord, String p, Locale locale, Classification type) {
+	public Palabra(int ord, String p, String locale, Classification type) {
 		// TODO Auto-generated constructor stub
 		this.ord = ord;
 		this.word = p;
@@ -27,12 +25,6 @@ public class Palabra {
 		this.type = type;
 	}
 	
-	public Locale getLocale() {
-		return locale;
-	}
-	public void setLocale(Locale locale) {
-		this.locale = locale;
-	}
 	public String getWord() {
 		return word;
 	}
@@ -45,6 +37,14 @@ public class Palabra {
 	public void setType(Classification type) {
 		this.type = type;
 	}
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
+
 	public long getId() {
 		return id;
 	}
