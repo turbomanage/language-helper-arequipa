@@ -3,6 +3,8 @@ package com.example.languagehelper;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import com.example.languagehelper.MainActivity.Direction;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +18,7 @@ public class WordAdapter extends ArrayAdapter<PalabraMap> {
 
 	private Context context;
 	private PalabraMap[] byOrig, byTrad;
-	private boolean isOrigFirst = true;
+	private Direction dir = Direction.LEFT;
 
 	public WordAdapter(Context context, int resource, PalabraMap[] objects) {
 		super(context, resource, objects);
@@ -49,7 +51,7 @@ public class WordAdapter extends ArrayAdapter<PalabraMap> {
 		View rowView = inflater.inflate(R.layout.row, null);
 		TextView orig = (TextView) rowView.findViewById(R.id.orig);
 		TextView trad = (TextView) rowView.findViewById(R.id.trad);
-		if (isOrigFirst) {
+		if (this.dir == Direction.LEFT) {
 			orig.setText(byOrig[position].getOrig());
 			trad.setText(byOrig[position].getTrad());
 		} else {
@@ -59,8 +61,8 @@ public class WordAdapter extends ArrayAdapter<PalabraMap> {
 		return rowView;
 	}
 
-	public void swapViews() {
-		this.isOrigFirst = !this.isOrigFirst;
+	public void setDirection(Direction selectedDirection) {
+		this.dir = selectedDirection;
 		this.notifyDataSetChanged();
 	}
 }

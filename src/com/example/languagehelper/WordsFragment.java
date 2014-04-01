@@ -5,7 +5,9 @@ import java.util.Locale;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 
+import com.example.languagehelper.MainActivity.Direction;
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.PalabraTable.Columns;
@@ -25,7 +27,12 @@ public class WordsFragment extends ListFragment {
 	}
 	
 	// TODO onAttach or event bus in onCreate to register listener
-	
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		Log.d("wordFragment", "onResume");
+		super.onResume();
+	}
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		tabNum = getArguments().getInt(KEY_TAB_NUM);
@@ -58,8 +65,8 @@ public class WordsFragment extends ListFragment {
 		return words;
 	}
 
-	public void swapViews() {
-		wordAdapter.swapViews();
+	public void setDirection(Direction selectedDirection) {
+		wordAdapter.setDirection(selectedDirection);
 	}
 
 }

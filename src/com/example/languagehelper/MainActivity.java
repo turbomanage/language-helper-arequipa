@@ -51,11 +51,12 @@ public class MainActivity extends ActionBarActivity implements
 	 */
 	ViewPager mViewPager;
 
+	public enum Direction {LEFT, RIGHT};
+	private Direction selectedDirection = Direction.LEFT;
 	private String[] locales;
 	private int selectedLocaleNum;
 
 	static final String ESPAÑOL = "es";
-
 	private ActionBar actionBar;
 
 	@Override
@@ -89,6 +90,8 @@ public class MainActivity extends ActionBarActivity implements
 					@Override
 					public void onPageSelected(int position) {
 						actionBar.setSelectedNavigationItem(position);
+						WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter.getItem(position);
+						wordsFragment.setDirection(MainActivity.this.selectedDirection);
 					}
 				});
 	}
@@ -162,13 +165,13 @@ public class MainActivity extends ActionBarActivity implements
 		case R.id.action_swap:
 			Log.i("MainActivity", "button pressed");
 			// TODO notify observers
-//			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
-//			frag.swapViews();
-			int numTabs = mSectionsPagerAdapter.getCount();
-			for (int i = 0; i < numTabs; i++) {
-				WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter.getItem(i);
-				wordsFragment.swapViews();
+			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+			if (selectedDirection == Direction.LEFT) {
+				selectedDirection = Direction.RIGHT;
+			} else {
+				selectedDirection = Direction.LEFT;
 			}
+			frag.setDirection(selectedDirection);
 		case R.id.action_settings:
 			return true;
 		default:
