@@ -7,7 +7,7 @@ import com.turbomanage.storm.api.Entity;
 @Entity
 public class Palabra {
 	
-	public enum Classification {CONNECTOR, PREPOSITION, VERB};
+	public enum Classification {TITLE, CONNECTOR, PREPOSITION, VERB};
 	
 	private long id;
 	int ord; // ordinal of the word in the file

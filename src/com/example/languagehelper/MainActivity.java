@@ -15,32 +15,30 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
+import com.example.languagehelper.dao.PalabraTable.Columns;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener, OnItemSelectedListener {
+		ActionBar.TabListener, OnItemSelectedListener, LanguageModel {
 
-	private static final String IS_INITIALIZED = "isInitialized";
+	private static final String TRANSLATIONS_FOLDER = "words";
+
+	private static final String KEY_INIT_LOCALES = "initLocales";
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -55,11 +53,9 @@ public class MainActivity extends ActionBarActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-	ConectoresFragment conectoresFragment;
-	ConectoresFragment preposicionesFragment;
-	ConectoresFragment verbosFragment;
 
 	private String[] locales;
+	private int selectedLocaleNum;
 
 	static final Locale ESPAÑOL = new Locale("es");
 
@@ -71,21 +67,16 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		// Init locales
+		initLocale("es");
+		this.selectedLocaleNum = readLocales();
+		initLocale(this.locales[this.selectedLocaleNum]);
 
-		// Initialize the database on first run
-		SharedPreferences settings = getPreferences(0);
-		if (!settings.getBoolean(IS_INITIALIZED, false)) {
-			populateDb();
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putBoolean(IS_INITIALIZED, true);
-			editor.commit();
-		}
-
-		conectoresFragment = new ConectoresFragment();
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+				this, getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -102,6 +93,7 @@ public class MainActivity extends ActionBarActivity implements
 					}
 				});
 
+		// TODO extract method
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 			// Create a tab with text corresponding to the page title defined by
@@ -114,11 +106,12 @@ public class MainActivity extends ActionBarActivity implements
 		}
 	}
 
-	int readLocales() {
+	private int readLocales() {
 		String defaultLocale = Locale.getDefault().getLanguage();
 		int defaultPos = 0;
 		try {
-			locales = getAssets().list("words");
+			// traverse directories
+			locales = getAssets().list(TRANSLATIONS_FOLDER);
 			for (int i = 0; i < locales.length; i++) {
 				String lc = locales[i];
 				if (lc.equals(defaultLocale)) {
@@ -134,7 +127,6 @@ public class MainActivity extends ActionBarActivity implements
 	@SuppressLint("NewApi")
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		int defaultPos = readLocales();
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
@@ -148,7 +140,7 @@ public class MainActivity extends ActionBarActivity implements
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
 		spinner.setAdapter(adapter);
-		spinner.setSelection(defaultPos);
+		spinner.setSelection(this.selectedLocaleNum);
 		return true;
 	}
 
@@ -161,21 +153,6 @@ public class MainActivity extends ActionBarActivity implements
 		return displayLanguages;
 	}
 
-	private List<String> getLocalesFromDb() {
-		List<String> locales = new ArrayList<String>();
-		PalabraDao dao = new PalabraDao(this);
-		SQLiteDatabase db = dao.getDbHelper(this).getReadableDatabase();
-		// SELECT DISTINCT Locale FROM PALABRA
-		Cursor c = db.query(true, "Palabra", new String[]{"Locale"}, null, null, null, null, null, null);
-		for (boolean hasItem = c.moveToFirst(); hasItem; hasItem = c.moveToNext()) {
-			String localeStr = c.getString(0);
-			Log.d(MainActivity.class.getName(), "locale: " + localeStr);
-			locales.add(new Locale(localeStr).getDisplayLanguage());
-		}
-		c.close();
-		return locales;
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -184,7 +161,9 @@ public class MainActivity extends ActionBarActivity implements
 		switch (item.getItemId()) {
 		case R.id.action_swap:
 			Log.i("MainActivity", "button pressed");
-			conectoresFragment.swapViews();
+			// TODO notify observers
+			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+			frag.swapViews();
 		case R.id.action_settings:
 			return true;
 		default:
@@ -228,134 +207,6 @@ public class MainActivity extends ActionBarActivity implements
 		return words;
 	}
 
-	private void populateDb() {
-		PalabraDao dao = new PalabraDao(this);
-		// poblar base de datos
-		try {
-			String[] files = getResources().getAssets().list("");
-			for (int i = 0; i < files.length; i++) {
-				String filename = files[i];
-				if (filename.startsWith("palabras")) {
-					Log.d(MainActivity.class.getName(), "file: " + filename);
-					String[] split = filename.split("\\.");
-					// Remove "palabras-"
-					String localeStr = split[0].substring(9);
-					List<String> palabras = readWords(filename);
-					for (int j = 0; j < palabras.size(); j++) {
-						String p = palabras.get(j);
-						Palabra palabra = new Palabra(j, p, new Locale(localeStr),
-								Classification.CONNECTOR);
-						dao.insert(palabra);
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Log.i(ConectoresFragment.class.getName(), "Database populated");
-	}
-
-	/**
-	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-	 * one of the sections/tabs/pages.
-	 */
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-		public SectionsPagerAdapter(FragmentManager fm) {
-			super(fm);
-		}
-
-		@Override
-		public Fragment getItem(int position) {
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a PlaceholderFragment (defined as a static inner class
-			// below).
-			// return PlaceholderFragment.newInstance(position + 1);
-			switch (position) {
-			case 0:
-				conectoresFragment = new ConectoresFragment();
-				return conectoresFragment;
-			case 1:
-				preposicionesFragment = new ConectoresFragment();
-				return preposicionesFragment;
-			case 2:
-				verbosFragment = new ConectoresFragment();
-				return verbosFragment;
-			case 3:
-				verbosFragment = new ConectoresFragment();
-				return verbosFragment;
-			case 4:
-				verbosFragment = new ConectoresFragment();
-				return verbosFragment;
-			case 5:
-				verbosFragment = new ConectoresFragment();
-				return verbosFragment;
-			case 6:
-				verbosFragment = new ConectoresFragment();
-				return verbosFragment;
-			default:
-				return null;
-			}
-		}
-
-		@Override
-		public int getCount() {
-			// Show 4 total pages.
-			return 6;
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position) {
-			Locale l = Locale.getDefault();
-			switch (position) {
-			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
-			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
-			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
-			}
-			return null;
-		}
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		private static final String ARG_SECTION_NUMBER = "section_number";
-
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-		public static PlaceholderFragment newInstance(int sectionNumber) {
-			PlaceholderFragment fragment = new PlaceholderFragment();
-			Bundle args = new Bundle();
-			args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-			fragment.setArguments(args);
-			return fragment;
-		}
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			TextView textView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			return rootView;
-		}
-	}
-
 	/* (non-Javadoc)
 	 * @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)
 	 * 
@@ -364,14 +215,88 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
-		String itemAtPosition = (String) adapterView.getItemAtPosition(pos);
-		Toast.makeText(this, "selected " + itemAtPosition, Toast.LENGTH_SHORT).show();
+//		String itemAtPosition = (String) adapterView.getItemAtPosition(pos);
+		initLocale(locales[pos]);
+		selectedLocaleNum = pos;
+		// TODO just replace the whole section pager adapter, but keep current tab selected
+		mSectionsPagerAdapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * Initialize the selected locale. If not yet initialized in shared prefs,
+	 * read the words for the locale and populate the database.
+	 * 
+	 * @param pos
+	 */
+	private void initLocale(String selectedLocale) {
+		// Populate database for selected language if necessary
+		SharedPreferences settings = getPreferences(0);
+		String initLocales = settings.getString(KEY_INIT_LOCALES, new String());
+		if (!initLocales.contains(selectedLocale)) {
+			populateDbForLocale(selectedLocale);
+			initLocales += "," + selectedLocale;
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(KEY_INIT_LOCALES, initLocales);
+			editor.commit();
+		}
+	}
+
+	private void populateDbForLocale(String selectedLocale) {
+		PalabraDao dao = new PalabraDao(this);
+		// poblar base de datos
+		try {
+			// Get all files in folder for locale
+			// TODO check to make sure they're all there
+			String path = TRANSLATIONS_FOLDER + "/" + selectedLocale;
+			String[] files = getResources().getAssets().list(path);
+			for (int i = 0; i < files.length; i++) {
+				String filename = files[i];
+				Log.d(MainActivity.class.getName(), "file: " + filename);
+				List<String> palabras = readWords(path + "/" + filename);
+				// Save title with ordinal 0
+				Palabra title = new Palabra(0, filename.substring(1), new Locale(selectedLocale), Classification.TITLE);
+				dao.insert(title);
+				for (int j = 0; j < palabras.size(); j++) {
+					String p = palabras.get(j);
+					// Use file numbers to read in order of Classification enum
+					Palabra palabra = new Palabra(j+1, p, new Locale(selectedLocale),
+							Classification.values()[i+1]);
+					dao.insert(palabra);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Log.i(WordsFragment.class.getName(), "Database populated");
 	}
 
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public String getSelectedLocale() {
+		return this.locales[this.selectedLocaleNum];
+	}
+
+	@Override
+	public Classification getClassificationForTab(int ord) {
+		// TODO Allow user ordering
+		return Classification.values()[ord + 1];
+	}
+
+	@Override
+	public int getNumTabs() {
+		return Classification.values().length - 1; // omit title
+	}
+
+	@Override
+	public String getTitleForTab(int ord) {
+		PalabraDao dao = new PalabraDao(this);
+		List<Palabra> types = dao.load().eq(Columns.ORD, 0).order(Columns.TYPE.asc()).list();
+		return types.get(ord).getWord();
 	}
 
 }
