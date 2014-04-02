@@ -12,6 +12,8 @@ public class Palabra {
 	String word;
 	String locale; // en
 	Classification type;
+	private String category;
+	private boolean favorite;
 	
 	public Palabra() {
 		// TODO Auto-generated constructor stub
@@ -58,6 +60,22 @@ public class Palabra {
 
 	public void setOrd(int ord) {
 		this.ord = ord;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public boolean isFavorite() {
+		return favorite;
+	}
+
+	public void setFavorite(boolean favorite) {
+		this.favorite = favorite;
 	}
 	
 }

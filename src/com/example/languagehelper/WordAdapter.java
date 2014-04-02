@@ -45,7 +45,6 @@ public class WordAdapter extends ArrayAdapter<PalabraMap> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		Log.d("view", "getview was called for " + position);
 		LayoutInflater inflater = (LayoutInflater) context
 		        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.row, null);
