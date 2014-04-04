@@ -12,7 +12,6 @@ import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -24,8 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
@@ -34,8 +31,8 @@ public class MainActivity extends ActionBarActivity implements
 		ActionBar.TabListener, OnItemSelectedListener {
 
 	private static final String TRANSLATIONS_FOLDER = "words";
-
 	private static final String KEY_INIT_LOCALES = "initLocales";
+	private static final String STATE_SELECTED_NAVIGATION_ITEM = "activeTab";
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -57,6 +54,7 @@ public class MainActivity extends ActionBarActivity implements
 	private int selectedLocaleNum;
 
 	static final String ESPAÑOL = "es";
+
 	private ActionBar actionBar;
 
 	@Override
@@ -94,6 +92,8 @@ public class MainActivity extends ActionBarActivity implements
 						wordsFragment.setDirection(MainActivity.this.selectedDirection);
 					}
 				});
+		
+		drawTabs();
 	}
 
 	// For each of the sections in the app, add a tab to the action bar.
@@ -132,18 +132,19 @@ public class MainActivity extends ActionBarActivity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
-		MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
-		Spinner spinner = (Spinner) spinnerItem.getActionView();
-		spinner.setOnItemSelectedListener(this);
-		// Create an ArrayAdapter using the string array and a default spinner
-		// layout
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-		adapter.addAll(getDisplayLanguages());
-		// Specify the layout to use when the list of choices appears
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// Apply the adapter to the spinner
-		spinner.setAdapter(adapter);
-		spinner.setSelection(this.selectedLocaleNum);
+		// Add language spinner--causes tabs to appear as list when rotate
+//		MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
+//		Spinner spinner = (Spinner) spinnerItem.getActionView();
+//		spinner.setOnItemSelectedListener(this);
+//		// Create an ArrayAdapter using the string array and a default spinner
+//		// layout
+//		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+//		adapter.addAll(getDisplayLanguages());
+//		// Specify the layout to use when the list of choices appears
+//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//		// Apply the adapter to the spinner
+//		spinner.setAdapter(adapter);
+//		spinner.setSelection(this.selectedLocaleNum);
 		return true;
 	}
 
@@ -177,6 +178,22 @@ public class MainActivity extends ActionBarActivity implements
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		// Restore the previously serialized current dropdown position.
+		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
+			getSupportActionBar().setSelectedNavigationItem(
+					savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		// Serialize the current dropdown position.
+		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getSupportActionBar()
+				.getSelectedNavigationIndex());
 	}
 
 	@Override
@@ -223,14 +240,14 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
-		initLocale(locales[pos]);
-		selectedLocaleNum = pos;
-		// TODO just replace the whole section pager adapter, but keep current tab selected
-		String selectedLocale = this.locales[this.selectedLocaleNum];
-		mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedLocale);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		actionBar.removeAllTabs();
-		drawTabs();
+//		initLocale(locales[pos]);
+//		selectedLocaleNum = pos;
+//		// TODO just replace the whole section pager adapter, but keep current tab selected
+//		String selectedLocale = this.locales[this.selectedLocaleNum];
+//		mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedLocale);
+//		mViewPager.setAdapter(mSectionsPagerAdapter);
+//		actionBar.removeAllTabs();
+//		drawTabs();
 	}
 
 	/**
