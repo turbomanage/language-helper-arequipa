@@ -56,6 +56,12 @@ public class WordsFragment extends ExpandableListFragment {
 		super.onActivityCreated(savedInstanceState);
 	}
 	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		// TODO save state of the expanded groups
+	}
+	
 	private String[] readFromDb(Classification c, String locale) {
 		PalabraDao dao = new PalabraDao(getActivity());
 		Palabra exampleQuery = new Palabra();

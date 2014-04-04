@@ -13,6 +13,12 @@
 	    android:layout_height="wrap_content">
     </TextView>
     
+    <ImageButton android:id="@+id/star"
+        android:background="@android:color/transparent"
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/check"/>
+    
     <TextView
         android:id="@+id/trad"
         android:padding="5dp"

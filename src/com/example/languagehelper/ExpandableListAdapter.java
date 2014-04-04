@@ -1,14 +1,14 @@
 package com.example.languagehelper;
 
-import java.util.ArrayList;
 import java.util.List;
-
-
+ 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -47,6 +47,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 			LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
 			view = infalInflater.inflate(R.layout.row, null);
 		}
+		final ImageButton star = (ImageButton) view.findViewById(R.id.star);
+		star.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				star.setSelected(!star.isSelected());
+				// TODO Rubén
+			}
+		});
 		TextView orig = (TextView) view.findViewById(R.id.orig);
 		orig.setText(child.getOrig());
 		TextView trad = (TextView) view.findViewById(R.id.trad);
