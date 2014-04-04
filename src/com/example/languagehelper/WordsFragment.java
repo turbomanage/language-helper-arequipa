@@ -1,10 +1,11 @@
 package com.example.languagehelper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.ExpandableListFragment;
 import android.util.Log;
 
 import com.example.languagehelper.MainActivity.Direction;
@@ -12,12 +13,12 @@ import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.PalabraTable.Columns;
 
-public class WordsFragment extends ListFragment {
+public class WordsFragment extends ExpandableListFragment {
 
 	public static final String KEY_TAB_NUM = "tabNum";
 	public static final String KEY_LOCALE = "locale";
 	
-	private WordAdapter wordAdapter;
+	private ExpandableListAdapter wordAdapter;
 	private int tabNum;
 	private MainActivity mainActivity;
 	private String locale;
@@ -45,7 +46,12 @@ public class WordsFragment extends ListFragment {
 		for (int i = 0; i < originales.length; i++) {
 			palabras[i] = new PalabraMap(originales[i], traducciones[i]);
 		}
-		wordAdapter = new WordAdapter(getActivity(), R.layout.row, palabras);
+		WordGroup group = new WordGroup("group1");
+		group.setWords(Arrays.asList(palabras));
+		List<WordGroup> groups = new ArrayList<WordGroup>();
+		groups.add(group);
+		wordAdapter = new ExpandableListAdapter(getActivity(), groups);
+//		wordAdapter = new WordAdapter(getActivity(), R.layout.row, palabras);
 		setListAdapter(wordAdapter);
 		super.onActivityCreated(savedInstanceState);
 	}
@@ -66,7 +72,7 @@ public class WordsFragment extends ListFragment {
 	}
 
 	public void setDirection(Direction selectedDirection) {
-		wordAdapter.setDirection(selectedDirection);
+//		wordAdapter.setDirection(selectedDirection);
 	}
 
 }
