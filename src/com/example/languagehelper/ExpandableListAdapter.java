@@ -1,6 +1,8 @@
 package com.example.languagehelper;
 
 import java.util.List;
+
+import com.example.languagehelper.dao.PalabraDao;
  
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,13 +13,21 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+/**
+ * http://www.dreamincode.net/forums/topic/270612-how-to-get-started-with-expandablelistview/
+ * @author david
+ *
+ */
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 	private Context context;
 	private List<WordGroup> groups;
+	private PalabraDao palabraDao;
+	
 	public ExpandableListAdapter(Context context, List<WordGroup> groups2) {
 		this.context = context;
 		this.groups = groups2;
+		palabraDao = new PalabraDao(context);
 	}
 	
 	public void addItem(PalabraMap item, WordGroup group) {
@@ -29,20 +39,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 		ch.add(item);
 		groups.get(index).setWords(ch);
 	}
+	
 	public Object getChild(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		List<PalabraMap> chList = groups.get(groupPosition).getWords();
 		return chList.get(childPosition);
 	}
 
 	public long getChildId(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return childPosition;
 	}
 
 	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view,
 			ViewGroup parent) {
-		PalabraMap child = (PalabraMap) getChild(groupPosition, childPosition);
+		final PalabraMap palabra = (PalabraMap) getChild(groupPosition, childPosition);
 		if (view == null) {
 			LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
 			view = infalInflater.inflate(R.layout.row, null);
@@ -52,36 +61,38 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 			@Override
 			public void onClick(View v) {
 				star.setSelected(!star.isSelected());
-				// TODO Rubén
+				Palabra orig = palabraDao.get(palabra.getId());
+				if (star.isSelected()) {
+					orig.setFavorite(true);
+				} else {
+					orig.setFavorite(false);
+				}
+				palabraDao.update(orig);
 			}
 		});
+		star.setSelected(palabra.isFavorite());
 		TextView orig = (TextView) view.findViewById(R.id.orig);
-		orig.setText(child.getOrig());
+		orig.setText(palabra.getOrig());
 		TextView trad = (TextView) view.findViewById(R.id.trad);
-		trad.setText(child.getTrad());
+		trad.setText(palabra.getTrad());
 		return view;
 	}
 
 	public int getChildrenCount(int groupPosition) {
-		// TODO Auto-generated method stub
 		List<PalabraMap> chList = groups.get(groupPosition).getWords();
-
 		return chList.size();
 
 	}
 
 	public Object getGroup(int groupPosition) {
-		// TODO Auto-generated method stub
 		return groups.get(groupPosition);
 	}
 
 	public int getGroupCount() {
-		// TODO Auto-generated method stub
 		return groups.size();
 	}
 
 	public long getGroupId(int groupPosition) {
-		// TODO Auto-generated method stub
 		return groupPosition;
 	}
 
@@ -98,12 +109,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	}
 
 	public boolean hasStableIds() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	public boolean isChildSelectable(int arg0, int arg1) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
