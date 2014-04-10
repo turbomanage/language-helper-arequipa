@@ -9,7 +9,7 @@ import android.support.v4.app.ExpandableListFragment;
 import android.widget.ExpandableListView;
 
 import com.example.languagehelper.MainActivity.Direction;
-import com.example.languagehelper.Palabra.Classification;
+import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.PalabraTable.Columns;
 import com.example.languagehelper.dao.WordGroupDao;
@@ -18,11 +18,12 @@ public class WordsFragment extends ExpandableListFragment {
 
 	public static final String KEY_TAB_NUM = "tabNum";
 	public static final String KEY_LOCALE = "locale";
+	public static final String KEY_PAGE_NUM = "pageId";
 	private static final String KEY_GROUP_STATE = "groupState";
 	
 	private ExpandableListAdapter wordAdapter;
-	private int tabNum;
 	private String locale;
+	private long pageNum;
 	
 	public WordsFragment() {
 		super();
@@ -30,26 +31,24 @@ public class WordsFragment extends ExpandableListFragment {
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		tabNum = getArguments().getInt(KEY_TAB_NUM);
-		locale = getArguments().getString(KEY_LOCALE);
 		// Get locale and classification from Bundle
-		Classification tabClassification = Classification.values()[tabNum];
-		List<WordGroup> groups = mergePalabrasFromDb(tabClassification, locale);
+		this.locale = getArguments().getString(KEY_LOCALE);
+		this.pageNum = getArguments().getLong(KEY_PAGE_NUM);
+		List<WordGroup> groups = mergePalabrasFromDb(pageNum, locale);
 		wordAdapter = new ExpandableListAdapter(getActivity(), groups);
 		setListAdapter(wordAdapter);
-		// Expand all groups by default
-		ExpandableListView elv = getExpandableListView();
-		for (int i = 0; i < groups.size(); i++) {
-			elv.expandGroup(i);
-		}
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	private List<WordGroup> getGroups(Classification tabClassification, String locale) {
+	private List<WordGroup> getGroups(long pageNum, String locale) {
+		PageDao pageDao = new PageDao(getActivity());
+		Page page = pageDao.load()
+				.eq(com.example.languagehelper.dao.PageTable.Columns.PAGENUM, pageNum)
+				.eq(com.example.languagehelper.dao.PageTable.Columns.LOCALE, locale)
+				.get();
 		WordGroupDao groupDao = new WordGroupDao(getActivity());
 		List<WordGroup> groups = groupDao.load()
-				.eq(com.example.languagehelper.dao.WordGroupTable.Columns.CLASSIFICATION, tabClassification)
-				.eq(com.example.languagehelper.dao.WordGroupTable.Columns.LOCALE, locale)
+				.eq(com.example.languagehelper.dao.WordGroupTable.Columns.PAGEID, page.getId())
 				.list();
 		return groups;
 	}
@@ -67,10 +66,10 @@ public class WordsFragment extends ExpandableListFragment {
 		return words;
 	}
 
-	private List<WordGroup> mergePalabrasFromDb(Classification type,
+	private List<WordGroup> mergePalabrasFromDb(long pageNum,
 			String locale) {
-		List<WordGroup> origGroups = getGroups(type, locale);
-		List<WordGroup> tradGroups = getGroups(type, locale);
+		List<WordGroup> origGroups = getGroups(pageNum, MainActivity.ESPAÑOL);
+		List<WordGroup> tradGroups = getGroups(pageNum, locale);
 		List<Palabra> origWords = getWordsInGroup(origGroups);
 		List<Palabra> tradWords = getWordsInGroup(tradGroups);
 
@@ -88,8 +87,8 @@ public class WordsFragment extends ExpandableListFragment {
 			boolean isFavorite = origWords.get(j).isFavorite();
 			long groupId = tradWords.get(j).getGroupId(); // origWords
 			Integer groupPos = joinMap.get(groupId);
-			List<WordPair> words = tradGroups.get(groupPos).getWords();
 			WordPair wordPair = new WordPair(id, groupId, orig, trad, isFavorite);
+			List<WordPair> words = tradGroups.get(groupPos).getWords();
 			words.add(wordPair);
 		}
 		
@@ -127,7 +126,9 @@ public class WordsFragment extends ExpandableListFragment {
 	
 	public void setDirection(Direction selectedDirection) {
 		// TODO Fix this Rubén
-//		wordAdapter.setDirection(selectedDirection);
+		wordAdapter.setDirection(selectedDirection);
+		ExpandableListView elv = getExpandableListView();
+		elv.invalidateViews();
 	}
 
 }

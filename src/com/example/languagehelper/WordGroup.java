@@ -12,17 +12,15 @@ public class WordGroup {
 	private long id;
 	private String name;
 	transient private List<WordPair> words = new ArrayList<WordPair>();
-	private Classification classification;
-	private String locale;
-
+	private long pageId;
+	
 	public WordGroup() {
 		// for storm-gen
 	}
 	
-	public WordGroup(String name, Classification classification, String locale) {
+	public WordGroup(String name, long pageId) {
 		this.name = name;
-		this.setClassification(classification);
-		this.setLocale(locale);
+		this.setPageId(pageId);
 	}
 	
 	public String getName() {
@@ -49,20 +47,12 @@ public class WordGroup {
 		this.id = id;
 	}
 
-	public Classification getClassification() {
-		return classification;
+	public long getPageId() {
+		return pageId;
 	}
 
-	public void setClassification(Classification classification) {
-		this.classification = classification;
-	}
-
-	public String getLocale() {
-		return locale;
-	}
-
-	public void setLocale(String locale) {
-		this.locale = locale;
+	public void setPageId(long pageId) {
+		this.pageId = pageId;
 	}
 
 }

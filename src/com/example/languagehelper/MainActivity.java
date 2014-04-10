@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.example.languagehelper.Palabra.Classification;
+import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.WordGroupDao;
 
@@ -285,20 +286,21 @@ public class MainActivity extends ActionBarActivity implements
 				List<String> lines = readLines(path + "/" + filename);
 				// Save title with ordinal 0
 				Classification type = Classification.values()[i];
-				Palabra title = new Palabra(0, filename.substring(1), locale, -1);
-				palabraDao.insert(title);
-				long newGroupId = -2; // hack
+				// TODO add page title
+				String title = filename.substring(1);
+				Page newPage = new Page(i, locale, title);
+				long newPageId = new PageDao(this).insert(newPage);
+				long newGroupId = -2; // hack, should never occur
 				for (int j = 0; j < lines.size(); j++) {
 					String line = lines.get(j);
 					if (line.startsWith("*")) {
 						String groupName = line.substring(1);
-						WordGroup newGroup = new WordGroup(groupName, type, locale);
+						WordGroup newGroup = new WordGroup(groupName, newPageId);
 						newGroupId = groupDao.insert(newGroup);
 					} else {
 						String p = line;
 						// Use file numbers to read in order of Classification enum
-						Palabra palabra = new Palabra(j+1, p, locale,
-								newGroupId);
+						Palabra palabra = new Palabra(j, p, newGroupId);
 						palabraDao.insert(palabra);
 					}
 				}
@@ -314,28 +316,5 @@ public class MainActivity extends ActionBarActivity implements
 		// TODO Auto-generated method stub
 		
 	}
-
-//	@Override
-//	public String getSelectedLocale() {
-//		return this.locales[this.selectedLocaleNum];
-//	}
-//
-//	@Override
-//	public Classification getClassificationForTab(int ord) {
-//		// TODO Allow user ordering
-//		return Classification.values()[ord + 1];
-//	}
-//
-//	@Override
-//	public int getNumTabs() {
-//		return Classification.values().length - 1; // omit title
-//	}
-//
-//	@Override
-//	public String getTitleForTab(int ord) {
-//		PalabraDao dao = new PalabraDao(this);
-//		List<Palabra> types = dao.load().eq(Columns.ORD, 0).order(Columns.TYPE.asc()).list();
-//		return types.get(ord).getWord();
-//	}
 
 }

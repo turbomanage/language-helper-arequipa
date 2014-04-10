@@ -2,6 +2,7 @@ package com.example.languagehelper;
 
 import java.util.List;
 
+import com.example.languagehelper.MainActivity.Direction;
 import com.example.languagehelper.dao.PalabraDao;
  
 import android.content.Context;
@@ -23,6 +24,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	private Context context;
 	private List<WordGroup> groups;
 	private PalabraDao palabraDao;
+	private Direction layoutDir = Direction.LEFT;
 	
 	public ExpandableListAdapter(Context context, List<WordGroup> groups) {
 		this.context = context;
@@ -52,9 +54,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view,
 			ViewGroup parent) {
 		final WordPair palabra = (WordPair) getChild(groupPosition, childPosition);
-		if (view == null) {
+		// TODO optimize?
+		if (true) {
 			LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-			view = infalInflater.inflate(R.layout.row, null);
+			if (this.layoutDir == Direction.LEFT) {
+				view = infalInflater.inflate(R.layout.row_swapped, null);
+			} else {
+				view = infalInflater.inflate(R.layout.row, null);
+			}
 		}
 		final ImageButton star = (ImageButton) view.findViewById(R.id.star);
 		star.setOnClickListener(new OnClickListener() {
@@ -71,10 +78,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 			}
 		});
 		star.setSelected(palabra.isFavorite());
-		TextView orig = (TextView) view.findViewById(R.id.orig);
-		orig.setText(palabra.getOrig());
-		TextView trad = (TextView) view.findViewById(R.id.trad);
-		trad.setText(palabra.getTrad());
+		TextView left = (TextView) view.findViewById(R.id.orig);
+		TextView right = (TextView) view.findViewById(R.id.trad);
+		left.setText(palabra.getTrad());
+		right.setText(palabra.getOrig());
 		return view;
 	}
 
@@ -116,6 +123,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 		return true;
 	}
 
+	public void setDirection(Direction selectedDirection) {
+		this.layoutDir = selectedDirection;
+	}
+
 }
-
-

@@ -1,11 +1,6 @@
 package com.example.languagehelper;
 
 import java.util.List;
-import java.util.Locale;
-
-import com.example.languagehelper.Palabra.Classification;
-import com.example.languagehelper.dao.PalabraDao;
-import com.example.languagehelper.dao.PalabraTable.Columns;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.example.languagehelper.Palabra.Classification;
+import com.example.languagehelper.dao.PageDao;
+import com.example.languagehelper.dao.PageTable.Columns;
 
 
 /**
@@ -25,14 +24,14 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 	// TODO change to listener or event bus
 	private final WordsFragment[] fragments;
 	private final String locale;
-	private final List<Palabra> titles;
+	private final List<Page> pages;
 
 	public SectionsPagerAdapter(Context ctx, FragmentManager fm, String locale) {
 		super(fm);
 		this.locale = locale;
 		this.fragments = new WordsFragment[Classification.values().length];
-		PalabraDao dao = new PalabraDao(ctx);
-		titles = dao.load().eq(Columns.ORD, 0).eq(Columns.LOCALE, locale).order(Columns._id.asc()).list();
+		PageDao dao = new PageDao(ctx);
+		this.pages = dao.load().eq(Columns.LOCALE, locale).order(Columns.PAGENUM.asc()).list();
 	}
 
 	@Override
@@ -42,6 +41,7 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 			Bundle bundle = new Bundle();
 			bundle.putInt(WordsFragment.KEY_TAB_NUM, position);
 			bundle.putString(WordsFragment.KEY_LOCALE, locale);
+			bundle.putLong(WordsFragment.KEY_PAGE_NUM, pages.get(position).getPageNum());
 			wordsFragment.setArguments(bundle);
 			this.fragments[position] = wordsFragment;
 		}
@@ -50,12 +50,12 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public int getCount() {
-		return titles.size();
+		return pages.size();
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		return titles.get(position).getWord();
+		return pages.get(position).getTitle();
 	}
 	
 }
