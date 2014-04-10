@@ -24,24 +24,24 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	private List<WordGroup> groups;
 	private PalabraDao palabraDao;
 	
-	public ExpandableListAdapter(Context context, List<WordGroup> groups2) {
+	public ExpandableListAdapter(Context context, List<WordGroup> groups) {
 		this.context = context;
-		this.groups = groups2;
+		this.groups = groups;
 		palabraDao = new PalabraDao(context);
 	}
 	
-	public void addItem(PalabraMap item, WordGroup group) {
+	public void addItem(WordPair item, WordGroup group) {
 		if (!groups.contains(group)) {
 			groups.add(group);
 		}
 		int index = groups.indexOf(group);
-		List<PalabraMap> ch = groups.get(index).getWords();
+		List<WordPair> ch = groups.get(index).getWords();
 		ch.add(item);
 		groups.get(index).setWords(ch);
 	}
 	
 	public Object getChild(int groupPosition, int childPosition) {
-		List<PalabraMap> chList = groups.get(groupPosition).getWords();
+		List<WordPair> chList = groups.get(groupPosition).getWords();
 		return chList.get(childPosition);
 	}
 
@@ -51,7 +51,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view,
 			ViewGroup parent) {
-		final PalabraMap palabra = (PalabraMap) getChild(groupPosition, childPosition);
+		final WordPair palabra = (WordPair) getChild(groupPosition, childPosition);
 		if (view == null) {
 			LayoutInflater infalInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
 			view = infalInflater.inflate(R.layout.row, null);
@@ -79,7 +79,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	}
 
 	public int getChildrenCount(int groupPosition) {
-		List<PalabraMap> chList = groups.get(groupPosition).getWords();
+		List<WordPair> chList = groups.get(groupPosition).getWords();
 		return chList.size();
 
 	}

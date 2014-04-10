@@ -1,13 +1,14 @@
 package com.example.languagehelper;
 
-public class PalabraMap {
+public class WordPair {
 
 	String orig, trad;
-	private long id;
+	private long id, groupId;
 	private boolean favorite;
 
-	public PalabraMap(long id, String orig, String trad, boolean isFavorite) {
+	public WordPair(long id, long groupId, String orig, String trad, boolean isFavorite) {
 		this.setId(id);
+		this.setGroupId(groupId);
 		this.orig = orig;
 		this.trad = trad;
 		this.favorite = isFavorite;
@@ -43,6 +44,14 @@ public class PalabraMap {
 
 	public void setFavorite(boolean favorite) {
 		this.favorite = favorite;
+	}
+
+	public long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(long groupid) {
+		this.groupId = groupid;
 	}
 	
 }

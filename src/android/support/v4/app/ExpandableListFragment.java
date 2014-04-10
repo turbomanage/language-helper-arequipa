@@ -99,6 +99,11 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 		return root;
 	}
 
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Attach to list view once Fragment is ready to run.
 	 */
@@ -106,6 +111,7 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		ensureList();
+		onRestoreInstanceState(savedInstanceState);
 	}
 
 	/**

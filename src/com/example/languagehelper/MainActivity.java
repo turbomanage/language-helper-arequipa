@@ -26,6 +26,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PalabraDao;
+import com.example.languagehelper.dao.WordGroupDao;
 
 public class MainActivity extends ActionBarActivity implements
 		ActionBar.TabListener, OnItemSelectedListener {
@@ -214,7 +215,7 @@ public class MainActivity extends ActionBarActivity implements
 			FragmentTransaction fragmentTransaction) {
 	}
 
-	private List<String> readWords(String filename) {
+	private List<String> readLines(String filename) {
 		ArrayList<String> words = new ArrayList<String>();
 		try {
 			InputStream is = getResources().getAssets().open(filename);
@@ -256,40 +257,50 @@ public class MainActivity extends ActionBarActivity implements
 	 * 
 	 * @param pos
 	 */
-	private void initLocale(String selectedLocale) {
+	private void initLocale(String locale) {
 		// Populate database for selected language if necessary
 		SharedPreferences settings = getPreferences(0);
 		String initLocales = settings.getString(KEY_INIT_LOCALES, new String());
-		if (!initLocales.contains(selectedLocale)) {
-			populateDbForLocale(selectedLocale);
-			initLocales += "," + selectedLocale;
+		if (!initLocales.contains(locale)) {
+			populateDbForLocale(locale);
+			initLocales += "," + locale;
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putString(KEY_INIT_LOCALES, initLocales);
 			editor.commit();
 		}
 	}
 
-	private void populateDbForLocale(String selectedLocale) {
-		PalabraDao dao = new PalabraDao(this);
+	private void populateDbForLocale(String locale) {
+		PalabraDao palabraDao = new PalabraDao(this);
+		WordGroupDao groupDao = new WordGroupDao(this);
 		// poblar base de datos
 		try {
 			// Get all files in folder for locale
 			// TODO check to make sure they're all there
-			String path = TRANSLATIONS_FOLDER + "/" + selectedLocale;
+			String path = TRANSLATIONS_FOLDER + "/" + locale;
 			String[] files = getResources().getAssets().list(path);
 			for (int i = 0; i < files.length; i++) {
 				String filename = files[i];
 				Log.d(MainActivity.class.getName(), "file: " + filename);
-				List<String> palabras = readWords(path + "/" + filename);
+				List<String> lines = readLines(path + "/" + filename);
 				// Save title with ordinal 0
-				Palabra title = new Palabra(0, filename.substring(1), selectedLocale, Classification.values()[i]);
-				dao.insert(title);
-				for (int j = 0; j < palabras.size(); j++) {
-					String p = palabras.get(j);
-					// Use file numbers to read in order of Classification enum
-					Palabra palabra = new Palabra(j+1, p, selectedLocale,
-							Classification.values()[i]);
-					dao.insert(palabra);
+				Classification type = Classification.values()[i];
+				Palabra title = new Palabra(0, filename.substring(1), locale, -1);
+				palabraDao.insert(title);
+				long newGroupId = -2; // hack
+				for (int j = 0; j < lines.size(); j++) {
+					String line = lines.get(j);
+					if (line.startsWith("*")) {
+						String groupName = line.substring(1);
+						WordGroup newGroup = new WordGroup(groupName, type, locale);
+						newGroupId = groupDao.insert(newGroup);
+					} else {
+						String p = line;
+						// Use file numbers to read in order of Classification enum
+						Palabra palabra = new Palabra(j+1, p, locale,
+								newGroupId);
+						palabraDao.insert(palabra);
+					}
 				}
 			}
 		} catch (IOException e) {

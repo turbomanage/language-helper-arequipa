@@ -11,20 +11,20 @@ public class Palabra {
 	int ord; // ordinal of the word in the file
 	String word;
 	String locale; // en
-	Classification type;
 	private String category;
 	private boolean favorite;
+	private long groupId;
 	
 	public Palabra() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Palabra(int ord, String p, String locale, Classification type) {
+	public Palabra(int ord, String p, String locale, long groupId) {
 		// TODO Auto-generated constructor stub
 		this.ord = ord;
 		this.word = p;
 		this.locale = locale;
-		this.type = type;
+		this.setGroupId(groupId);
 	}
 	
 	public String getWord() {
@@ -32,12 +32,6 @@ public class Palabra {
 	}
 	public void setWord(String word) {
 		this.word = word;
-	}
-	public Classification getType() {
-		return type;
-	}
-	public void setType(Classification type) {
-		this.type = type;
 	}
 	public String getLocale() {
 		return locale;
@@ -76,6 +70,14 @@ public class Palabra {
 
 	public void setFavorite(boolean favorite) {
 		this.favorite = favorite;
+	}
+
+	public long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(long groupId) {
+		this.groupId = groupId;
 	}
 	
 }

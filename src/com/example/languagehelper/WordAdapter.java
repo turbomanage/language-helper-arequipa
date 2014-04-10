@@ -14,13 +14,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class WordAdapter extends ArrayAdapter<PalabraMap> {
+public class WordAdapter extends ArrayAdapter<WordPair> {
 
 	private Context context;
-	private PalabraMap[] byOrig, byTrad;
+	private WordPair[] byOrig, byTrad;
 	private Direction dir = Direction.LEFT;
 
-	public WordAdapter(Context context, int resource, PalabraMap[] objects) {
+	public WordAdapter(Context context, int resource, WordPair[] objects) {
 		super(context, resource, objects);
 		this.context = context;
 		this.byOrig = objects.clone();
@@ -29,16 +29,16 @@ public class WordAdapter extends ArrayAdapter<PalabraMap> {
 		Arrays.sort(byTrad, sortByTrad);
 	}
 
-	private Comparator<PalabraMap> sortByOrig = new Comparator<PalabraMap>() {
+	private Comparator<WordPair> sortByOrig = new Comparator<WordPair>() {
 		@Override
-		public int compare(PalabraMap lhs, PalabraMap rhs) {
+		public int compare(WordPair lhs, WordPair rhs) {
 			return lhs.getOrig().compareTo(rhs.getOrig());
 		}
 	};
 
-	private Comparator<PalabraMap> sortByTrad = new Comparator<PalabraMap>() {
+	private Comparator<WordPair> sortByTrad = new Comparator<WordPair>() {
 		@Override
-		public int compare(PalabraMap lhs, PalabraMap rhs) {
+		public int compare(WordPair lhs, WordPair rhs) {
 			return lhs.getTrad().compareTo(rhs.getTrad());
 		}
 	};
