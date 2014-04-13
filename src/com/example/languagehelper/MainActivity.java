@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+import com.example.languagehelper.ApplicationState.Model;
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
@@ -50,8 +51,7 @@ public class MainActivity extends ActionBarActivity implements
 	 */
 	ViewPager mViewPager;
 
-	public enum Direction {LEFT, RIGHT};
-	private Direction selectedDirection = Direction.LEFT;
+	public enum Direction {TRAD_ON_LEFT, TRAD_ON_RIGHT};
 	private String[] locales;
 	private int selectedLocaleNum;
 
@@ -91,7 +91,7 @@ public class MainActivity extends ActionBarActivity implements
 					public void onPageSelected(int position) {
 						actionBar.setSelectedNavigationItem(position);
 						WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter.getItem(position);
-						wordsFragment.setDirection(MainActivity.this.selectedDirection);
+						wordsFragment.notifyDirectionChanged();
 					}
 				});
 		
@@ -169,12 +169,8 @@ public class MainActivity extends ActionBarActivity implements
 			Log.i("MainActivity", "button pressed");
 			// TODO notify observers
 			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
-			if (selectedDirection == Direction.LEFT) {
-				selectedDirection = Direction.RIGHT;
-			} else {
-				selectedDirection = Direction.LEFT;
-			}
-			frag.setDirection(selectedDirection);
+			Model.INSTANCE.swapDirection();
+			frag.notifyDirectionChanged();
 		case R.id.action_settings:
 			return true;
 		default:
