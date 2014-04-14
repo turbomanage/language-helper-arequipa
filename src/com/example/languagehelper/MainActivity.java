@@ -24,7 +24,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import com.example.languagehelper.ApplicationState.Model;
 import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
@@ -91,13 +90,12 @@ public class MainActivity extends ActionBarActivity implements
 					public void onPageSelected(int position) {
 						actionBar.setSelectedNavigationItem(position);
 						WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter.getItem(position);
-						wordsFragment.notifyDirectionChanged();
 					}
 				});
 		
 		drawTabs();
 	}
-
+	
 	// For each of the sections in the app, add a tab to the action bar.
 	private void drawTabs() {
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
@@ -169,8 +167,7 @@ public class MainActivity extends ActionBarActivity implements
 			Log.i("MainActivity", "button pressed");
 			// TODO notify observers
 			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
-			Model.INSTANCE.swapDirection();
-			frag.notifyDirectionChanged();
+			ApplicationState.getModel().swapAndNotify();
 		case R.id.action_settings:
 			return true;
 		default:

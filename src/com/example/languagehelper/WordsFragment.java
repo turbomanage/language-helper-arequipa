@@ -2,7 +2,10 @@ package com.example.languagehelper;
 
 import android.os.Bundle;
 import android.support.v4.app.ExpandableListFragment;
+import android.util.Log;
 import android.widget.ExpandableListView;
+
+import com.squareup.otto.Subscribe;
 
 public class WordsFragment extends ExpandableListFragment {
 
@@ -27,6 +30,18 @@ public class WordsFragment extends ExpandableListFragment {
 		wordAdapter = new ExpandableListAdapter(getActivity(), pageNum, locale);
 		setListAdapter(wordAdapter);
 		super.onActivityCreated(savedInstanceState);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		ApplicationState.getBus().unregister(this);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		ApplicationState.getBus().register(this);
 	}
 
 	@Override
@@ -58,9 +73,8 @@ public class WordsFragment extends ExpandableListFragment {
 		outState.putBooleanArray(KEY_GROUP_STATE, groupState);
 	}
 	
-	public void notifyDirectionChanged() {
-		// TODO Fixed, Rubén
-		wordAdapter.setDirection();
+	@Subscribe public void notifyDirectionChanged(OrderChangedEvent event) {
+		wordAdapter.notifyDirectionChanged();
 		ExpandableListView elv = getExpandableListView();
 		elv.invalidateViews();
 	}

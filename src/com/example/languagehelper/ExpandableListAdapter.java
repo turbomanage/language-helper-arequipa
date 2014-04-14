@@ -15,7 +15,6 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.languagehelper.ApplicationState.Model;
 import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.PalabraTable.Columns;
@@ -34,13 +33,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	private PalabraDao palabraDao;
 	private List<WordGroup> origGroups;
 	private List<WordGroup> tradGroups;
-	private List<WordGroup> selectedGroups;
-
+	
 	public ExpandableListAdapter(Context ctx, long pageNum, String locale) {
 		this.mContext = ctx;
 		palabraDao = new PalabraDao(mContext);
 		sortAndGroup(pageNum, locale);
-		setDirection();
 	}
 
 	private void sortAndGroup(long pageNum, String locale) {
@@ -112,8 +109,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 		for (int i = 0; i < groupIds.length; i++) {
 			groupIds[i] = Long.toString(groups.get(i).getId());
 		}
-		PalabraDao dao = new PalabraDao(this.mContext);
-		List<Palabra> words = dao.load().in(Columns.GROUPID, groupIds)
+		List<Palabra> words = palabraDao.load().in(Columns.GROUPID, groupIds)
 				.order(Columns.ORD.asc()).list();
 		return words;
 	}
@@ -157,18 +153,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 		}
 	}
 
-	public void setDirection() {
-		if (Model.INSTANCE.getDirection()) {
-			this.selectedGroups = tradGroups;
+	private List<WordGroup> getSelectedGroups() {
+		if (ApplicationState.getModel().getDirection()) {
+			return tradGroups;
 		} else {
-			this.selectedGroups = origGroups;
+			return origGroups;
 		}
+	}
+
+	public void notifyDirectionChanged() {
 		notifyDataSetChanged();
 	}
 
 	@Override
 	public Object getChild(int groupPosition, int childPosition) {
-		List<WordPair> chList = selectedGroups.get(groupPosition).getWords();
+		List<WordPair> chList = getSelectedGroups().get(groupPosition).getWords();
 		return chList.get(childPosition);
 	}
 
@@ -186,7 +185,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 		if (true) {
 			LayoutInflater infalInflater = (LayoutInflater) mContext
 					.getSystemService(mContext.LAYOUT_INFLATER_SERVICE);
-			if (Model.INSTANCE.getDirection()) {
+			if (ApplicationState.getModel().getDirection()) {
 				view = infalInflater.inflate(R.layout.row_trad_first, null);
 			} else {
 				view = infalInflater.inflate(R.layout.row_orig_first, null);
@@ -214,19 +213,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		List<WordPair> chList = selectedGroups.get(groupPosition).getWords();
+		List<WordPair> chList = getSelectedGroups().get(groupPosition).getWords();
 		return chList.size();
 
 	}
 
 	@Override
 	public Object getGroup(int groupPosition) {
-		return selectedGroups.get(groupPosition);
+		return getSelectedGroups().get(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return selectedGroups.size();
+		return getSelectedGroups().size();
 	}
 
 	@Override
