@@ -35,13 +35,13 @@ public class WordsFragment extends ExpandableListFragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-		ApplicationState.getBus().unregister(this);
+		ApplicationState.getEventBus().unregister(this);
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApplicationState.getBus().register(this);
+		ApplicationState.getEventBus().register(this);
 	}
 
 	@Override

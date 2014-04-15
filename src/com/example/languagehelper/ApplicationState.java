@@ -19,7 +19,7 @@ public class ApplicationState {
 		return MODEL;
 	}
 
-	public static Bus getBus() {
+	public static Bus getEventBus() {
 		return BUS;
 	}
 
