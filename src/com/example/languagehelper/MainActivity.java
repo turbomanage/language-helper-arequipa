@@ -20,17 +20,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
-import com.example.languagehelper.Palabra.Classification;
 import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.WordGroupDao;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener, OnItemSelectedListener {
+		ActionBar.TabListener {
 
 	private static final String TRANSLATIONS_FOLDER = "words";
 	private static final String KEY_INIT_LOCALES = "initLocales";
@@ -74,6 +70,7 @@ public class MainActivity extends ActionBarActivity implements
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
+		// TODO problem: recreates fragments on rotation, so all fragment state is lost
 		mSectionsPagerAdapter = new SectionsPagerAdapter(this,
 				getSupportFragmentManager(), selectedLocale);
 
@@ -164,9 +161,6 @@ public class MainActivity extends ActionBarActivity implements
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
 		case R.id.action_swap:
-			Log.i("MainActivity", "button pressed");
-			// TODO notify observers
-			WordsFragment frag = (WordsFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
 			ApplicationState.getModel().swapAndNotify();
 		case R.id.action_settings:
 			return true;
@@ -227,24 +221,6 @@ public class MainActivity extends ActionBarActivity implements
 		return words;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)
-	 * 
-	 * Language spinner
-	 */
-	@Override
-	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
-			long id) {
-//		initLocale(locales[pos]);
-//		selectedLocaleNum = pos;
-//		// TODO just replace the whole section pager adapter, but keep current tab selected
-//		String selectedLocale = this.locales[this.selectedLocaleNum];
-//		mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), selectedLocale);
-//		mViewPager.setAdapter(mSectionsPagerAdapter);
-//		actionBar.removeAllTabs();
-//		drawTabs();
-	}
-
 	/**
 	 * Initialize the selected locale. If not yet initialized in shared prefs,
 	 * read the words for the locale and populate the database.
@@ -278,8 +254,6 @@ public class MainActivity extends ActionBarActivity implements
 				Log.d(MainActivity.class.getName(), "file: " + filename);
 				List<String> lines = readLines(path + "/" + filename);
 				// Save title with ordinal 0
-				Classification type = Classification.values()[i];
-				// TODO add page title
 				String title = filename.substring(1);
 				Page newPage = new Page(i, locale, title);
 				long newPageId = new PageDao(this).insert(newPage);
@@ -302,12 +276,6 @@ public class MainActivity extends ActionBarActivity implements
 			e.printStackTrace();
 		}
 		Log.i(WordsFragment.class.getName(), "Database populated");
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

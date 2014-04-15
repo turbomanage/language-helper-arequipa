@@ -1,7 +1,6 @@
 package android.support.v4.app;
 
 import android.os.Bundle;
-
 import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -16,7 +15,6 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.ListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 /*
@@ -55,6 +53,7 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 	boolean mFinishedStart = false;
 
 	public ExpandableListFragment() {
+		// fragment requires no-arg constructor
 	}
 
 	/**
@@ -97,11 +96,6 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 		root.setLayoutParams(lp);
 
 		return root;
-	}
-
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**
@@ -318,20 +312,17 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 
 	@Override
 	public void onGroupExpand(int arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onGroupCollapse(int arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public boolean onChildClick(ExpandableListView arg0, View arg1, int arg2,
 			int arg3, long arg4) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -360,4 +351,9 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 		}
 		mFinishedStart = true;
 	}
+
+	public void onRestoreInstanceState(Bundle inState) {
+		// TODO is it still necessary? 
+	}
+	
 }

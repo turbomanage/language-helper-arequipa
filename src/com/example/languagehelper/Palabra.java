@@ -5,8 +5,6 @@ import com.turbomanage.storm.api.Entity;
 @Entity
 public class Palabra {
 	
-	public enum Classification {CONNECTOR, PREPOSITION, VERB};
-	
 	private long id;
 	int ord; // ordinal of the word in the file
 	private String word;
@@ -15,11 +13,10 @@ public class Palabra {
 	private long groupId;
 	
 	public Palabra() {
-		// TODO Auto-generated constructor stub
+		// empty for storm-gen
 	}
 	
 	public Palabra(int ord, String p, long groupId) {
-		// TODO Auto-generated constructor stub
 		this.ord = ord;
 		this.word = p;
 		this.setGroupId(groupId);

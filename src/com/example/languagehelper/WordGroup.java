@@ -3,7 +3,6 @@ package com.example.languagehelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.languagehelper.Palabra.Classification;
 import com.turbomanage.storm.api.Entity;
 
 @Entity

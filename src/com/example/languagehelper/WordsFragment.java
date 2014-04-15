@@ -2,7 +2,6 @@ package com.example.languagehelper;
 
 import android.os.Bundle;
 import android.support.v4.app.ExpandableListFragment;
-import android.util.Log;
 import android.widget.ExpandableListView;
 
 import com.squareup.otto.Subscribe;
@@ -20,6 +19,12 @@ public class WordsFragment extends ExpandableListFragment {
 	
 	public WordsFragment() {
 		super();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setRetainInstance(true);
 	}
 	
 	@Override
@@ -45,7 +50,7 @@ public class WordsFragment extends ExpandableListFragment {
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Bundle inState) {
+	public void onRestoreInstanceState(Bundle inState) {
 		super.onRestoreInstanceState(inState);
 		if (inState == null) {
 			return;

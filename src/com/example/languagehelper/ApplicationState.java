@@ -24,7 +24,7 @@ public class ApplicationState {
 	}
 
 	private ApplicationState() {
-		// TODO Auto-generated constructor stub
+		// prevent instantiation
 	}
 
 }
