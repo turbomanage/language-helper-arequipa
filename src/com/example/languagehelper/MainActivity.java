@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -46,7 +47,10 @@ public class MainActivity extends ActionBarActivity implements
 	 */
 	ViewPager mViewPager;
 
-	public enum Direction {TRAD_ON_LEFT, TRAD_ON_RIGHT};
+	public enum Direction {
+		TRAD_ON_LEFT, TRAD_ON_RIGHT
+	};
+
 	private String[] locales;
 	private int selectedLocaleNum;
 
@@ -61,7 +65,7 @@ public class MainActivity extends ActionBarActivity implements
 
 		actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		
+
 		// Init locales
 		initLocale("es");
 		this.selectedLocaleNum = readLocales();
@@ -70,7 +74,8 @@ public class MainActivity extends ActionBarActivity implements
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
-		// TODO problem: recreates fragments on rotation, so all fragment state is lost
+		// TODO problem: recreates fragments on rotation, so all fragment state
+		// is lost
 		mSectionsPagerAdapter = new SectionsPagerAdapter(this,
 				getSupportFragmentManager(), selectedLocale);
 
@@ -86,13 +91,14 @@ public class MainActivity extends ActionBarActivity implements
 					@Override
 					public void onPageSelected(int position) {
 						actionBar.setSelectedNavigationItem(position);
-						WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter.getItem(position);
+						WordsFragment wordsFragment = (WordsFragment) mSectionsPagerAdapter
+								.getItem(position);
 					}
 				});
-		
+
 		drawTabs();
 	}
-	
+
 	// For each of the sections in the app, add a tab to the action bar.
 	private void drawTabs() {
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
@@ -130,18 +136,20 @@ public class MainActivity extends ActionBarActivity implements
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		// Add language spinner--causes tabs to appear as list when rotate
-//		MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
-//		Spinner spinner = (Spinner) spinnerItem.getActionView();
-//		spinner.setOnItemSelectedListener(this);
-//		// Create an ArrayAdapter using the string array and a default spinner
-//		// layout
-//		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-//		adapter.addAll(getDisplayLanguages());
-//		// Specify the layout to use when the list of choices appears
-//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//		// Apply the adapter to the spinner
-//		spinner.setAdapter(adapter);
-//		spinner.setSelection(this.selectedLocaleNum);
+		// MenuItem spinnerItem = menu.findItem(R.id.language_spinner);
+		// Spinner spinner = (Spinner) spinnerItem.getActionView();
+		// spinner.setOnItemSelectedListener(this);
+		// // Create an ArrayAdapter using the string array and a default
+		// spinner
+		// // layout
+		// ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		// android.R.layout.simple_spinner_item);
+		// adapter.addAll(getDisplayLanguages());
+		// // Specify the layout to use when the list of choices appears
+		// adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// // Apply the adapter to the spinner
+		// spinner.setAdapter(adapter);
+		// spinner.setSelection(this.selectedLocaleNum);
 		return true;
 	}
 
@@ -170,19 +178,22 @@ public class MainActivity extends ActionBarActivity implements
 	}
 
 	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	public void onResume() {
+		super.onResume();
 		// Restore the previously serialized current dropdown position.
-		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
-			getSupportActionBar().setSelectedNavigationItem(
-					savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
-		}
+		getSupportActionBar().setSelectedNavigationItem(
+				getPreferences(0).getInt(STATE_SELECTED_NAVIGATION_ITEM, 0));
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onPause() {
+		super.onPause();
 		// Serialize the current dropdown position.
-		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getSupportActionBar()
-				.getSelectedNavigationIndex());
+		SharedPreferences prefs = getPreferences(0);
+		Editor prefsEditor = prefs.edit();
+		prefsEditor.putInt(STATE_SELECTED_NAVIGATION_ITEM,
+				getSupportActionBar().getSelectedNavigationIndex());
+		prefsEditor.commit();
 	}
 
 	@Override
@@ -266,7 +277,8 @@ public class MainActivity extends ActionBarActivity implements
 						newGroupId = groupDao.insert(newGroup);
 					} else {
 						String p = line;
-						// Use file numbers to read in order of Classification enum
+						// Use file numbers to read in order of Classification
+						// enum
 						Palabra palabra = new Palabra(j, p, newGroupId);
 						palabraDao.insert(palabra);
 					}

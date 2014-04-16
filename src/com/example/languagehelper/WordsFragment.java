@@ -1,32 +1,30 @@
 package com.example.languagehelper;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.ExpandableListFragment;
+import android.util.Log;
 import android.widget.ExpandableListView;
 
 import com.squareup.otto.Subscribe;
 
 public class WordsFragment extends ExpandableListFragment {
 
+	private static final String KEY_EXPANDED_GROUPS_FOR_PAGE = "groupsForPage";
 	public static final String KEY_TAB_NUM = "tabNum";
 	public static final String KEY_LOCALE = "locale";
 	public static final String KEY_PAGE_NUM = "pageId";
 	private static final String KEY_GROUP_STATE = "groupState";
-	
+
 	private ExpandableListAdapter wordAdapter;
 	private String locale;
 	private long pageNum;
-	
+
 	public WordsFragment() {
 		super();
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setRetainInstance(true);
-	}
-	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// Get locale and classification from Bundle
@@ -36,13 +34,14 @@ public class WordsFragment extends ExpandableListFragment {
 		setListAdapter(wordAdapter);
 		super.onActivityCreated(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onPause() {
-		super.onPause();
 		ApplicationState.getEventBus().unregister(this);
+		onSaveInstanceState(null); // not called otherwise!
+		super.onPause();
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -52,13 +51,15 @@ public class WordsFragment extends ExpandableListFragment {
 	@Override
 	public void onRestoreInstanceState(Bundle inState) {
 		super.onRestoreInstanceState(inState);
-		if (inState == null) {
-			return;
-		}
+		// Retrieve expanded groups from preferences
 		ExpandableListView elv = getExpandableListView();
-		boolean[] groupState = inState.getBooleanArray(KEY_GROUP_STATE);
-		for (int i = 0; i < groupState.length; i++) {
-			if (groupState[i]) {
+		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
+		int numGroups = ela.getGroupCount();
+		SharedPreferences settings = getActivity().getPreferences(0);
+		String key = KEY_EXPANDED_GROUPS_FOR_PAGE + this.pageNum;
+		int groupStateMask = settings.getInt(key, 0);
+		for (int i = 0; i < numGroups; i++) {
+			if ((groupStateMask & (1<<i)) != 0) {
 				elv.expandGroup(i);
 			}
 		}
@@ -68,17 +69,24 @@ public class WordsFragment extends ExpandableListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		ExpandableListView elv = getExpandableListView();
-		int numGroups = elv.getChildCount();
-		boolean[] groupState = new boolean[numGroups];
+		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
+		int numGroups = ela.getGroupCount();
+		int groupStateMask = 0;
 		for (int i = 0; i < numGroups; i++) {
 			if (elv.isGroupExpanded(i)) {
-				groupState[i] = true;
+				groupStateMask += (1<<i);
 			}
 		}
-		outState.putBooleanArray(KEY_GROUP_STATE, groupState);
+		// Store in preferences
+		SharedPreferences settings = getActivity().getPreferences(0);
+		Editor prefs = settings.edit();
+		String key = KEY_EXPANDED_GROUPS_FOR_PAGE + this.pageNum;
+		prefs.putInt(key, groupStateMask);
+		prefs.commit();
 	}
-	
-	@Subscribe public void notifyDirectionChanged(OrderChangedEvent event) {
+
+	@Subscribe
+	public void notifyDirectionChanged(OrderChangedEvent event) {
 		wordAdapter.notifyDirectionChanged();
 		ExpandableListView elv = getExpandableListView();
 		elv.invalidateViews();
