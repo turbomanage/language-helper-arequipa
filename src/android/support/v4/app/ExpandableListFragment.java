@@ -105,7 +105,6 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		ensureList();
-		onRestoreInstanceState(savedInstanceState);
 	}
 
 	/**
@@ -350,10 +349,6 @@ public class ExpandableListFragment extends android.support.v4.app.Fragment
 			setListAdapter(mAdapter);
 		}
 		mFinishedStart = true;
-	}
-
-	public void onRestoreInstanceState(Bundle inState) {
-		// TODO is it still necessary? 
 	}
 	
 }
