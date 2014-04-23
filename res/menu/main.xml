@@ -7,6 +7,11 @@
         android:icon="@drawable/ic_action_swap"
         android:title="Swap"
         app:showAsAction="always" />
+
+    <item android:id="@+id/action_add"
+        android:icon="@drawable/ic_action_add"
+        android:title="Add word"
+        app:showAsAction="always" />
     
 <!--     <item android:id="@+id/language_spinner"
         android:title="Select language"

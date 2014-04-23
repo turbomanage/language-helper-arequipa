@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.ExpandableListFragment;
-import android.util.Log;
 import android.widget.ExpandableListView;
 
 import com.squareup.otto.Subscribe;
@@ -15,7 +14,6 @@ public class WordsFragment extends ExpandableListFragment {
 	public static final String KEY_TAB_NUM = "tabNum";
 	public static final String KEY_LOCALE = "locale";
 	public static final String KEY_PAGE_NUM = "pageId";
-	private static final String KEY_GROUP_STATE = "groupState";
 
 	private ExpandableListAdapter wordAdapter;
 	private String locale;
@@ -38,36 +36,6 @@ public class WordsFragment extends ExpandableListFragment {
 	@Override
 	public void onPause() {
 		ApplicationState.getEventBus().unregister(this);
-		onSaveInstanceState(null); // not called otherwise!
-		super.onPause();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		ApplicationState.getEventBus().register(this);
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle inState) {
-		super.onRestoreInstanceState(inState);
-		// Retrieve expanded groups from preferences
-		ExpandableListView elv = getExpandableListView();
-		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
-		int numGroups = ela.getGroupCount();
-		SharedPreferences settings = getActivity().getPreferences(0);
-		String key = KEY_EXPANDED_GROUPS_FOR_PAGE + this.pageNum;
-		int groupStateMask = settings.getInt(key, 0);
-		for (int i = 0; i < numGroups; i++) {
-			if ((groupStateMask & (1<<i)) != 0) {
-				elv.expandGroup(i);
-			}
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 		ExpandableListView elv = getExpandableListView();
 		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
 		int numGroups = ela.getGroupCount();
@@ -83,6 +51,25 @@ public class WordsFragment extends ExpandableListFragment {
 		String key = KEY_EXPANDED_GROUPS_FOR_PAGE + this.pageNum;
 		prefs.putInt(key, groupStateMask);
 		prefs.commit();
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		ApplicationState.getEventBus().register(this);
+		// Retrieve expanded groups from preferences
+		ExpandableListView elv = getExpandableListView();
+		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
+		int numGroups = ela.getGroupCount();
+		SharedPreferences settings = getActivity().getPreferences(0);
+		String key = KEY_EXPANDED_GROUPS_FOR_PAGE + this.pageNum;
+		int groupStateMask = settings.getInt(key, 0);
+		for (int i = 0; i < numGroups; i++) {
+			if ((groupStateMask & (1<<i)) != 0) {
+				elv.expandGroup(i);
+			}
+		}
 	}
 
 	@Subscribe

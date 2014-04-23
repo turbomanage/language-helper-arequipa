@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -21,13 +22,15 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.example.languagehelper.AddWordDialog.AddWordDialogListener;
 import com.example.languagehelper.dao.PageDao;
 import com.example.languagehelper.dao.PalabraDao;
 import com.example.languagehelper.dao.WordGroupDao;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener {
+		ActionBar.TabListener, AddWordDialogListener {
 
 	private static final String TRANSLATIONS_FOLDER = "words";
 	private static final String KEY_INIT_LOCALES = "initLocales";
@@ -172,9 +175,22 @@ public class MainActivity extends ActionBarActivity implements
 			ApplicationState.getModel().swapAndNotify();
 		case R.id.action_settings:
 			return true;
+		case R.id.action_add:
+			showAddDialog();
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+    private void showAddDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        AddWordDialog dlg = new AddWordDialog();
+        dlg.show(fm, "fragment_add_word");
+    }
+
+	@Override
+	public void onFinishEditDialog(String text) {
+		Toast.makeText(this, "new word is " + text, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
