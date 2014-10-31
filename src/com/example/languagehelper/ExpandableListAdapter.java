@@ -41,7 +41,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	}
 
 	private void sortAndGroup(long pageNum, String locale) {
-		origGroups = loadGroups(pageNum, MainActivity.ESPAÑOL);
+		origGroups = loadGroups(pageNum, MainActivity.ESPANOL);
 		tradGroups = loadGroups(pageNum, locale);
 		List<Palabra> origWords = loadWordsInGroup(origGroups);
 		List<Palabra> tradWords = loadWordsInGroup(tradGroups);

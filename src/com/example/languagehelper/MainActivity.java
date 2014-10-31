@@ -56,7 +56,7 @@ public class MainActivity extends ActionBarActivity implements
 	private String[] locales;
 	private int selectedLocaleNum;
 
-	static final String ESPAÑOL = "es";
+	static final String ESPANOL = "es";
 
 	private ActionBar actionBar;
 
