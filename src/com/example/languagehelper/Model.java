@@ -10,6 +10,6 @@ public class Model {
 
 	public void swapAndNotify() {
 		this.tradOnLeft = !this.tradOnLeft;
-		ApplicationState.getEventBus().post(new OrderChangedEvent());
+		App.getEventBus().post(new OrderChangedEvent());
 	};
 }

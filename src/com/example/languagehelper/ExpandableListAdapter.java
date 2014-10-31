@@ -154,7 +154,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 	}
 
 	private List<WordGroup> getSelectedGroups() {
-		if (ApplicationState.getModel().getDirection()) {
+		if (App.getModel().getDirection()) {
 			return tradGroups;
 		} else {
 			return origGroups;
@@ -185,7 +185,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 		if (true) {
 			LayoutInflater infalInflater = (LayoutInflater) mContext
 					.getSystemService(mContext.LAYOUT_INFLATER_SERVICE);
-			if (ApplicationState.getModel().getDirection()) {
+			if (App.getModel().getDirection()) {
 				view = infalInflater.inflate(R.layout.row_trad_first, null);
 			} else {
 				view = infalInflater.inflate(R.layout.row_orig_first, null);

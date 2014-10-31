@@ -147,7 +147,7 @@ public class MainActivity extends ActionBarActivity implements
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
 		case R.id.action_swap:
-			ApplicationState.getModel().swapAndNotify();
+			App.getModel().swapAndNotify();
 		case R.id.action_settings:
 			return true;
 		case R.id.action_add:

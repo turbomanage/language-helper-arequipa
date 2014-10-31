@@ -10,7 +10,7 @@ import com.squareup.otto.Bus;
  * 
  * @author david
  */
-public class ApplicationState {
+public class App {
 
 	private static final Model MODEL = new Model();
 	private static final Bus BUS = new Bus();
@@ -23,7 +23,7 @@ public class ApplicationState {
 		return BUS;
 	}
 
-	private ApplicationState() {
+	private App() {
 		// prevent instantiation
 	}
 

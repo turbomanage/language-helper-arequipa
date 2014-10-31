@@ -35,7 +35,7 @@ public class WordsFragment extends ExpandableListFragment {
 
 	@Override
 	public void onPause() {
-		ApplicationState.getEventBus().unregister(this);
+		App.getEventBus().unregister(this);
 		ExpandableListView elv = getExpandableListView();
 		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
 		int numGroups = ela.getGroupCount();
@@ -57,7 +57,7 @@ public class WordsFragment extends ExpandableListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApplicationState.getEventBus().register(this);
+		App.getEventBus().register(this);
 		// Retrieve expanded groups from preferences
 		ExpandableListView elv = getExpandableListView();
 		ExpandableListAdapter ela = (ExpandableListAdapter) getExpandableListAdapter();
