@@ -14,7 +14,7 @@
 <li>Learn how to add a button to the ActionBar.</li>
 <li>Learn how to launch a simple dialog.</li>
 <li>Learn the easiest way to store data with Android SQLite.</li>
-<li>Learn how to make HTTP reuqests to a server.</li>
+<li>How to wrap Web content with a WebView.</li>
 </ol>
 <h2>Table of Contents</h2>
 <dl>
@@ -25,9 +25,8 @@
 
 <h2 id="lab4">Lab 4 Import the Language Helper code</h2>
 <ol>
-<li>In Eclipse, go to File | Import | Android > Import Existing Android Code into Workspace</li>
-<li>Choose the language-helper-arequipa folder</li>
-<li>Click Finish. You should see the project created with no errors.</li>
+<li>Usually, you can use File | Import Existing Android Code to import an Android project. For the lab, this has already been done for you.</li>
+<li>In Eclipse, choose the language helper project.</li>
 <li>Run the app (Run As | Android Application).</li>
 </ol>
 
@@ -39,13 +38,12 @@
 <li>Modify the appropriate layout file so that the group headings appear in bold text.</li>
 </ol>
 
-<h2 id="lab6">Lab 6 Add a button to the ActionBar</h2>
+<h2 id="lab6">Lab 6 Remove a button from the ActionBar</h2>
 <ol>
 <li>Locate onCreateOptionsMenu in MainActivity.java.</li>
-<li>In the corresponding layout file, comment out the add button.</li>
-<li>Note the error which now appears in the Java code and comment it out, too.</li> 
+<li>In the corresponding layout file, comment out the first item tag (action_swap).</li>
+<li>Note the error which now appears in the Java code and comment out those lines, too.</li> 
 <li>Run the app to see that the button is gone.</li>
-<li>Uncomment  the lines you commented out to restore the button.</li>
 </ol>
 <h2 id="lab7">Lab 7 Replace an icon on the ActionBar</h2>
 <ol>
@@ -54,6 +52,66 @@
 <li>Name the icon ic_action_add to match the existing name. Click Next.</li>
 <li>Choose a new image from Clipart. Click Next, then Replace All when you get the warning.</li>
 <li>Run the app to see the new button in the action bar.</li>
+</ol>
+
+<h2>Lab 8 Add a new button to the ActionBar and show a Toast</h2>
+<ol>
+  <li>Locate the  layout file main.xml and add a new item. To do this, copy the XML for the action_add item and change the action name from action_add to action_toast in  both the id attribute and the icon attribute.</li>
+  <li>Locate onCreateOptionsMenu() in MainActivity.java.</li>
+  <li>Add a new case in onCreateOptionsMenu for R.id.action_toast. In the code for this case, show a Toast using the code below.</li>
+  <li>Run the app to see that the button shows the Toast.</li>
+</ol>
+<pre>
+	Toast.makeText(getApplicationContext(), &quot;hello&quot;, Toast<br>.LENGTH_SHORT).show();
+</pre>
+
+<h2>Lab 9 Use a WebView</h2>
+<ol>
+  <li>File | New | Android Layout XML File</li>
+  <li>Choose Layout XML File. Click Next.</li>
+  <li>In the File: field, type layout_webview</li>
+  <li>In the Root Element field, choose WebView. Click Finish.</li>
+  <li>When the new file appears, click the word WebView in the center of the design. In the Properties panel to the right, click the three dots for the Id attribute (first in the list) and type mywebview. The XML code for layout_webview.xml should look like the snippet below.
+  <li>In MainActivity.java, create a new method showWebView() using the code below.</li>
+  <li>Locate onCreateOptionsMenu() in MainActivity.java.</li>
+  <li>In the case for R.id.action_toast, replace the code to show a Toast with the new method showWebView().</li>
+  <li>In  AndroidManifest.xml, add the required permission shown below.</li>
+  <li>Run the app to see that the button loads the Google homepage in your app.</li>
+</ol>
+layout_webview.xml:
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+  &lt;WebView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+  android:id=&quot;@+id/mywebview&quot;
+  android:layout_width=&quot;match_parent&quot;
+  android:layout_height=&quot;match_parent&quot; &gt;
+&lt;/WebView&gt;
+</pre>
+MainActivity.java:
+<pre>
+	private void showWebView() {
+		setContentView(R.layout.layout_webivew);
+		WebView webview = (WebView) findViewById(R.id.mywebview);
+		webview.setWebViewClient(new WebViewClient());
+		webview.loadUrl("http://www.google.com");
+	}
+</pre>
+AndroidManifest.xml:
+<pre>
+    &lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;
+</pre>
+
+<h2>Lab 10 Use storm-gen and write a  simple unit test</h2>
+<p>In this exercise, you are going to use storm-gen to access
+the Android SQLite database from a unit test.</p>
+<ol>
+  <li>File | New | Android Test Project. Name the new project lhtest. Click Next and select the language helper project as the test target. Click Finish.</li>
+  <li>In the test project, create a new class StormTest that extends AndroidTestCase.</li>
+  <li>Create a new method public void testQuery().</li>
+  <li>In the method, create a new PalabraDao(getContext());</li>
+  <li>Use dao.load.list() to retrieve all Palabra records.</li>
+  <li>Write an assertion (assertEquals) that says there should be 96 records.</li>
+  <li>Run the test project as an Android Unit Test. See that it fails.</li>
+  <li>Now change the assertion to 110 records and run it again. It should pass.</li>
 </ol>
 
 </body>
